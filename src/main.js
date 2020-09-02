@@ -2,10 +2,14 @@ import Vue from 'vue'
 import App from './App.vue'
 import HelloWorld from './components/HelloWorld.vue'
 import Comp1 from './components/Comp1.vue'
+import vuetify from './plugins/vuetify';
 
 Vue.config.productionTip = false;
 
-let mainObj = {message:"ого"};
+let mainObj = {
+  message:"ого",
+  drawer : true
+};
 let openMap = new Map();
 
 let startObj = {
@@ -48,7 +52,8 @@ Vue.component('uni-comp', {
 });
 
 new Vue({
-  render: h => h(App),
+  vuetify,
+  render: h => h(App)
 }).$mount('#app');
 
 export {openMap, mainObj, openIDs}
