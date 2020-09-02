@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div   v-bind:hidden="!visible">
       <v-app-bar app color="primary" dark>
         <v-app-bar-nav-icon @click="mainObj.drawer = true"></v-app-bar-nav-icon>
         <v-toolbar-title>Карточки рейсов</v-toolbar-title>
@@ -11,6 +11,7 @@
       </v-app-bar>
       <v-main>
         <h1>ыыыы</h1>
+        <p>{{visible}}</p>
       </v-main>
     </div>
 </template>
@@ -20,6 +21,12 @@ export default {
     name: "Comp1",
     data: () => ({
     mainObj: mainObj
-  })
+  }),
+  props: {
+    visible: {
+      type: Boolean,
+      required: true
+    }
+  }
 }
 </script>
