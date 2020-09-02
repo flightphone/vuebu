@@ -1,8 +1,54 @@
 import Vue from 'vue'
 import App from './App.vue'
+import HelloWorld from './components/HelloWorld.vue'
+import Comp1 from './components/Comp1.vue'
 
-Vue.config.productionTip = false
+Vue.config.productionTip = false;
+
+let mainObj = {message:"ого"};
+let openMap = new Map();
+
+let startObj = {
+  Control: HelloWorld,
+  Params: "1445",
+  SQLParams: {},
+  data: {}
+}
+openMap.set("839", startObj);
+openMap.set("-1", 
+{
+  Control: Comp1,
+  Params: "",
+  SQLParams: {},
+  data: {}
+});
+
+
+let openIDs = [];
+openIDs.push("839");
+openIDs.push("-1");
+
+
+Vue.component('uni-comp', {
+  data: function() {
+    return {
+      openMap: openMap
+    };
+  },
+  props: {
+    id: {
+      type: String,
+      required: true
+    }
+  },
+  render: function (createElement){
+    let C = openMap.get(this.id).Control;
+    return createElement(C);
+  }
+});
 
 new Vue({
   render: h => h(App),
-}).$mount('#app')
+}).$mount('#app');
+
+export {openMap, mainObj, openIDs}
