@@ -1,6 +1,9 @@
 <template>
   <v-app>
-    <v-navigation-drawer v-model="mainObj.drawer" absolute temporary>
+    <v-navigation-drawer v-model="mainObj.drawer" 
+    absolute
+    temporary
+    >
       <v-list nav dense>
         <v-list-item-group active-class="deep-purple--text text--accent-4">
           <v-list-item @click="mainObj.current='-1';mainObj.drawer=false">
@@ -35,6 +38,10 @@ export default {
       openIDs: openIDs,
       mainObj: mainObj
     };
+  },
+  mounted: function() {
+    let elHtml = document.getElementsByTagName('html')[0]
+    elHtml.style.overflowY = 'hidden'
   }
 };
 </script>

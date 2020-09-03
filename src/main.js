@@ -10,7 +10,7 @@ Vue.config.productionTip = false;
 let mainObj = {
   message: "ого",
   drawer: false,
-  current: "-2"
+  current: "-1"
 };
 let openMap = new Map();
 
