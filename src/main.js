@@ -76,7 +76,6 @@ Vue.component('uni-comp', {
     let C = openMap.get(this.id).Control;
     let params = openMap.get(this.id).Params;
     let v = (mainObj.current == this.id);
-    //let v = "aaa";
     return createElement(C,{
       props: {
         id: this.id,

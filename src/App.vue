@@ -2,7 +2,19 @@
   <v-app>
     <v-navigation-drawer v-model="mainObj.drawer" absolute temporary width="auto">
       <p v-if="loading">Загрузка...</p>
-      <v-treeview v-else :items="treeJson"></v-treeview>
+      <v-treeview v-else 
+      :items="treejson" 
+      :hoverable="hoverable"
+      :open-on-click="openOnClick"
+      :selected-color="selectedColor"
+      :color="color"
+      :shaped="shaped"
+      :rounded="rounded"
+      >
+      <template slot="label" slot-scope="{ item }">
+          <div @click="handleselect(item)">{{ item.text }}</div>
+      </template>
+      </v-treeview>
     </v-navigation-drawer>
 
     <template v-for="item in openIDs">
@@ -13,7 +25,7 @@
   
 
 <script>
-import { mainObj, openIDs, prodaction, baseUrl, createMenuMap, menuMap } from "./main";
+import { mainObj, openIDs, prodaction, baseUrl, menuMap } from "./main";
 
 export default {
   name: "App",
@@ -22,9 +34,43 @@ export default {
       openIDs: openIDs,
       mainObj: mainObj,
       loading: true,
-      treeJson: []
+      treejson: [],
+      
+      dense: false,
+      selectable: false,
+      activatable: true,
+      hoverable: false,
+      openOnClick: true,
+      shaped: false,
+      rounded: false,
+      color: 'primary',
+      selectedColor: 'accent',
+      selectedColors: [
+        'accent',
+        'teal',
+        'red',
+        'success',
+        'warning lighten-2',
+      ],
+      multipleactive: false
+      
     };
   },
+  methods: {
+    handleselect: function (item) {
+      if (!item.children)
+      {
+        //alert(item.attributes.link1);
+        this.save(item);
+        mainObj.drawer = false;
+      }
+    },
+    save: function(item)
+    {
+      alert(item.attributes.link1)
+    }
+
+  },  
   mounted: async function() {
     let elHtml = document.getElementsByTagName("html")[0];
     elHtml.style.overflowY = "hidden";
@@ -39,8 +85,8 @@ export default {
 
     let data = await response.json();
     menuMap.clear();
-    createMenuMap(data);
-    this.treeJson = data;
+    //createMenuMap(data);
+    this.treejson = data;
     this.loading = false;
     
     
