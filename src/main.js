@@ -12,7 +12,22 @@ let mainObj = {
   drawer: false,
   current: "-1"
 };
+const prodaction = false;
+const baseUrl = (prodaction) ? "" : "http://192.168.43.81:5000/";
+
 let openMap = new Map();
+
+let menuMap = new Map();
+function createMenuMap(tree) {
+  tree.map((node) => {
+    node.name = node.text;
+    if (node.children == null)
+      menuMap.set(node.id, node.attributes);
+    else
+      createMenuMap(node.children);
+  });
+}
+
 
 /*
 let startObj = {
@@ -77,4 +92,4 @@ new Vue({
   render: h => h(App)
 }).$mount('#app');
 
-export { openMap, mainObj, openIDs }
+export { openMap, mainObj, openIDs, prodaction, baseUrl, createMenuMap, menuMap }
