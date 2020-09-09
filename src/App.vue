@@ -2,18 +2,19 @@
   <v-app>
     <v-navigation-drawer v-model="mainObj.drawer" absolute temporary width="auto">
       <p v-if="loading">Загрузка...</p>
-      <v-treeview v-else 
-      :items="treejson" 
-      :hoverable="hoverable"
-      :open-on-click="openOnClick"
-      :selected-color="selectedColor"
-      :color="color"
-      :shaped="shaped"
-      :rounded="rounded"
+      <v-treeview
+        v-else
+        :items="treejson"
+        :hoverable="hoverable"
+        :open-on-click="openOnClick"
+        :selected-color="selectedColor"
+        :color="color"
+        :shaped="shaped"
+        :rounded="rounded"
       >
-      <template slot="label" slot-scope="{ item }">
+        <template slot="label" slot-scope="{ item }">
           <div @click="handleselect(item)">{{ item.text }}</div>
-      </template>
+        </template>
       </v-treeview>
     </v-navigation-drawer>
 
@@ -25,7 +26,9 @@
   
 
 <script>
-import { mainObj, openIDs, prodaction, baseUrl, menuMap } from "./main";
+import { mainObj, openIDs, prodaction, baseUrl, openMap } from "./main";
+import Comp1 from './components/Comp1.vue';
+import Finder from './components/Finder.vue';
 
 export default {
   name: "App",
@@ -35,7 +38,7 @@ export default {
       mainObj: mainObj,
       loading: true,
       treejson: [],
-      
+
       dense: false,
       selectable: false,
       activatable: true,
@@ -43,34 +46,63 @@ export default {
       openOnClick: true,
       shaped: false,
       rounded: false,
-      color: 'primary',
-      selectedColor: 'accent',
-      selectedColors: [
-        'accent',
-        'teal',
-        'red',
-        'success',
-        'warning lighten-2',
-      ],
+      color: "primary",
+      selectedColor: "accent",
+      selectedColors: ["accent", "teal", "red", "success", "warning lighten-2"],
       multipleactive: false
-      
     };
   },
   methods: {
-    handleselect: function (item) {
-      if (!item.children)
-      {
+    handleselect: function(item) {
+      if (!item.children) {
         //alert(item.attributes.link1);
-        this.save(item);
+        this.open(item);
         mainObj.drawer = false;
       }
     },
-    save: function(item)
-    {
-      alert(item.attributes.link1)
-    }
+    open: function(item) {
+      let id = item.id;
+      if (openMap.get(id) == null) {
+        let c = this.getForm(item);
+        let obj = {
+          Control: c.Conrol,
+          Params: c.Params,
+          SQLParams: c.SQLParams,
+          data: {}
+        };
+        openMap.set(id, obj);
+        openIDs.push(id);
+      }
+      //Setcurrent(id);
+      mainObj.current = id;
+    },
+    getForm: function(item) {
+      let p = item.attributes;
+      let control = p.params ? Finder : Comp1;
+      let params = p.params;
+      let SQLParams = null; 
+      if (p.link1 == "RegulationPrint.repSDM") {
+        SQLParams = {
+          "@DateStart": "2000-01-01",
+          "@DateFinish": "2099-01-01"
+        };
+      }
 
-  },  
+      if (p.link1 == "RegulationPrint.ServiceReport") {
+        SQLParams = {
+          "@DateStart": "2000-01-01",
+          "@DateFinish": "2099-01-01",
+          "@AL_UTG": "<Все>"
+        };
+      }
+
+      return {
+        Conrol: control,
+        Params: params,
+        SQLParams: SQLParams
+      };
+    }
+  },
   mounted: async function() {
     let elHtml = document.getElementsByTagName("html")[0];
     elHtml.style.overflowY = "hidden";
@@ -84,12 +116,8 @@ export default {
     });
 
     let data = await response.json();
-    menuMap.clear();
-    //createMenuMap(data);
     this.treejson = data;
     this.loading = false;
-    
-    
   }
 };
 </script>

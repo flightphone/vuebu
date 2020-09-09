@@ -1,8 +1,7 @@
 import Vue from 'vue'
 import App from './App.vue'
 
-import Comp1 from './components/Comp1.vue';
-import Comp2 from './components/Comp2.vue'
+import Comp2 from './components/Comp1.vue';
 import vuetify from './plugins/vuetify';
 
 Vue.config.productionTip = false;
@@ -17,16 +16,7 @@ const baseUrl = (prodaction) ? "" : "http://192.168.43.81:5000/";
 
 let openMap = new Map();
 
-let menuMap = new Map();
-function createMenuMap(tree) {
-  tree.map((node) => {
-    node.name = node.text;
-    if (node.children == null)
-      menuMap.set(node.id, node.attributes);
-    else
-      createMenuMap(node.children);
-  });
-}
+
 
 
 /*
@@ -40,23 +30,17 @@ openMap.set("839", startObj);
 */
 openMap.set("-1",
   {
-    Control: Comp1,
+    Control: Comp2,
     Params: "",
     SQLParams: {},
     data: {}
   });
 
-openMap.set("-2", 
-{
-  Control: Comp2,
-  Params: "",
-  SQLParams: {},
-  data: {}
-});
+
 
 let openIDs = [];
 openIDs.push("-1");
-openIDs.push("-2");
+
 
 
 Vue.component('uni-comp', {
@@ -91,4 +75,4 @@ new Vue({
   render: h => h(App)
 }).$mount('#app');
 
-export { openMap, mainObj, openIDs, prodaction, baseUrl, createMenuMap, menuMap }
+export { openMap, mainObj, openIDs, prodaction, baseUrl }
