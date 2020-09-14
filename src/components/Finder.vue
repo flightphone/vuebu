@@ -2,10 +2,94 @@
   <div v-bind:hidden="!visible" style="height:100vh;maxheight:100vh;overflow:auto">
     <v-app-bar app color="primary" dark>
       <v-app-bar-nav-icon @click="mainObj.drawer = true"></v-app-bar-nav-icon>
-
       <v-toolbar-title>{{Descr}}</v-toolbar-title>
       <v-spacer></v-spacer>
+      <v-btn icon @click="ismenu = true">
+        <v-icon>mdi-dots-vertical</v-icon>
+      </v-btn>
     </v-app-bar>
+
+    <v-navigation-drawer v-model="ismenu" temporary absolute width="auto">
+      <v-list>
+        <v-list-item-group>
+          <template v-if="(editid==null) && (OpenMapData().EditProc)">
+            <v-list-item key="6" @click="ismenu=false">
+              <v-list-item-icon>
+                <v-icon>mdi-plus</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>Добавить</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item key="7" @click="ismenu=false">
+              <v-list-item-icon>
+                <v-icon>mdi-pencil</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>Редактировать</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item key="8" @click="ismenu=false">
+              <v-list-item-icon>
+                <v-icon>mdi-delete</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>Удалить</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </template>
+
+          <v-list-item key="1" @click="ismenu=false">
+            <v-list-item-icon>
+              <v-icon>mdi-filter-menu</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>Фильтровка и сортировка</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+
+          <v-list-item key="2" @click="ismenu=false">
+            <v-list-item-icon>
+              <v-icon>mdi-code-tags</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>Страницы</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+
+          <template v-if="(editid==null)">
+            <v-list-item key="3" @click="ismenu=false">
+              <v-list-item-icon>
+                <v-icon>mdi-cloud-download</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>Экспорт в CSV</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item key="4" @click="ismenu=false" v-if="OpenMapData().KeyValue">
+              <v-list-item-icon>
+                <v-icon>mdi-details</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>Детали</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item key="5" @click="ismenu=false" v-if="filterid!= null">
+              <v-list-item-icon>
+                <v-icon>mdi-cog</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>Параметры</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </template>
+        </v-list-item-group>
+      </v-list>
+    </v-navigation-drawer>
     <v-main>
       <v-simple-table v-if="!load" height="fill" fixed-header="true">
         <template v-slot:default>
@@ -45,7 +129,8 @@ export default {
     load: true,
     mode: "grid",
     Descr: "Загрузка...",
-    current: 0
+    current: 0,
+    ismenu: false
   }),
   props: {
     visible: {
@@ -162,7 +247,7 @@ export default {
 
 <style scoped>
 .selected {
-  background-color: violet;
-  color: seagreen;
+  background-color: lightcoral;
+  color: lightskyblue;
 }
 </style>

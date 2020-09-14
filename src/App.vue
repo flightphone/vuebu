@@ -7,10 +7,6 @@
         :items="treejson"
         :hoverable="hoverable"
         :open-on-click="openOnClick"
-        :selected-color="selectedColor"
-        :color="color"
-        :shaped="shaped"
-        :rounded="rounded"
       >
         <template slot="label" slot-scope="{ item }">
           <div @click="handleselect(item)">{{ item.text }}</div>
@@ -38,18 +34,9 @@ export default {
       mainObj: mainObj,
       loading: true,
       treejson: [],
-
-      dense: false,
-      selectable: false,
-      activatable: true,
       hoverable: false,
-      openOnClick: true,
-      shaped: false,
-      rounded: false,
-      color: "primary",
-      selectedColor: "accent",
-      selectedColors: ["accent", "teal", "red", "success", "warning lighten-2"],
-      multipleactive: false
+      openOnClick: true
+      
     };
   },
   methods: {
