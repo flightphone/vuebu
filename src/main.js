@@ -9,8 +9,23 @@ Vue.config.productionTip = false;
 let mainObj = {
   message: "ого",
   drawer: false,
-  current: "-1"
-};
+  current: "-1",
+  openAlert: false,
+  alert: function(title, text){
+    this.alertConfirm = false;
+    this.alertTitle = title;
+    this.alertText = text;
+    this.openAlert = true;
+  },
+  confirm: function(title, text, action){
+    this.alertConfirm = true;
+    this.alertTitle = title;
+    this.alertText = text;
+    this.confirmAction = action;
+    this.openAlert = true;
+  }
+  
+}; 
 const prodaction = false;
 const baseUrl = (prodaction) ? "" : "http://192.168.43.81:5000/";
 

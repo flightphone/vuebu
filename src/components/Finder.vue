@@ -31,7 +31,7 @@
               </v-list-item-content>
             </v-list-item>
 
-            <v-list-item key="8" @click="ismenu=false">
+            <v-list-item key="8" @click="confirmDelete()">
               <v-list-item-icon>
                 <v-icon>mdi-delete</v-icon>
               </v-list-item-icon>
@@ -236,6 +236,53 @@ let Finder = {
           a.setAttribute("download", "data.csv");
           a.click();
         });
+    },
+
+    confirmDelete: function(){
+        this.ismenu = false;
+        let mid = this.OpenMapData();
+        if (mid.curRow == null)
+            return;
+        let rw = mid.MainTab[mid.curRow];
+        let val = rw[mid.DispField];
+        mainObj.confirm(this.Descr, "Удалить запись '" + val + "'?", this.rowDelete)
+    },
+
+    rowDelete: async function(){
+        let mid = this.OpenMapData();
+        let SQLParams = {};
+        SQLParams[mid.KeyF] = mid.MainTab[mid.curRow][mid.KeyF];
+        if (mid.DelProc.toLowerCase().indexOf("_del_1") > -1) {
+            SQLParams["AUDTUSER"] = mid.Account;
+        }
+
+        const url = baseUrl + "React/exec";
+        let bd = new FormData();
+
+        bd.append("EditProc", mid.DelProc);
+        bd.append("SQLParams", JSON.stringify(SQLParams));
+        bd.append("KeyF", mid.KeyF);
+
+        const response = await fetch(url,
+            {
+                method: 'POST',
+                mode: (prodaction) ? 'no-cors' : 'cors',
+                cache: 'no-cache',
+                credentials: (prodaction) ? 'include' : 'omit',
+                body: bd
+            }
+        );
+
+        const res = await response.json();
+        if (res.message != "OK" && res.message != "Invalid storage type: DBNull.") {
+            mainObj.alert("Ошибка", res.message);
+            return;
+        }
+        mid.MainTab.splice(mid.curRow, 1);
+        let c = this.current;
+        this.current = -1;
+        this.current = c;
+
     }
   },
   mounted: async function() {
@@ -279,7 +326,7 @@ let Finder = {
 
     const data = await response.json();
     if (data.Error) {
-      alert(data.Error);
+      mainObj.alert("Ошибка", data.Error);
     } else {
       data.curRow = 0;
       data.WorkRow = {};
