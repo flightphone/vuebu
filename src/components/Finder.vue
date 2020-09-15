@@ -12,7 +12,7 @@
     <v-navigation-drawer v-model="ismenu" temporary absolute width="auto">
       <v-list>
         <v-list-item-group>
-          <template v-if="(editid==null) && (OpenMapData().EditProc)">
+          <template v-if="(editid==null) && (OpenMapData().EditProc) && !load">
             <v-list-item key="6" @click="ismenu=false">
               <v-list-item-icon>
                 <v-icon>mdi-plus</v-icon>
@@ -40,27 +40,28 @@
               </v-list-item-content>
             </v-list-item>
           </template>
+          <template v-if="!load">
+            <v-list-item key="1" @click="ismenu=false">
+              <v-list-item-icon>
+                <v-icon>mdi-filter-menu</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>Фильтровка и сортировка</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
 
-          <v-list-item key="1" @click="ismenu=false">
-            <v-list-item-icon>
-              <v-icon>mdi-filter-menu</v-icon>
-            </v-list-item-icon>
-            <v-list-item-content>
-              <v-list-item-title>Фильтровка и сортировка</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
+            <v-list-item key="2" @click="ismenu=false">
+              <v-list-item-icon>
+                <v-icon>mdi-code-tags</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>Страницы</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </template>
 
-          <v-list-item key="2" @click="ismenu=false">
-            <v-list-item-icon>
-              <v-icon>mdi-code-tags</v-icon>
-            </v-list-item-icon>
-            <v-list-item-content>
-              <v-list-item-title>Страницы</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-
-          <template v-if="(editid==null)">
-            <v-list-item key="3" @click="ismenu=false">
+          <template v-if="(editid==null) && !load">
+            <v-list-item key="3" @click="csv()">
               <v-list-item-icon>
                 <v-icon>mdi-cloud-download</v-icon>
               </v-list-item-icon>
@@ -69,7 +70,7 @@
               </v-list-item-content>
             </v-list-item>
 
-            <v-list-item key="4" @click="ismenu=false" v-if="OpenMapData().KeyValue">
+            <v-list-item key="4" @click="openDetail()" v-if="OpenMapData().KeyValue">
               <v-list-item-icon>
                 <v-icon>mdi-details</v-icon>
               </v-list-item-icon>
@@ -120,8 +121,8 @@
   </div>
 </template>
 <script>
-import { mainObj, openMap, prodaction, baseUrl } from "../main";
-export default {
+import { mainObj, openMap, openIDs, prodaction, baseUrl } from "../main";
+let Finder = {
   name: "Finder",
   data: () => ({
     mainObj: mainObj,
@@ -186,6 +187,55 @@ export default {
         openMap.get(this.id).data.setCurrent(index);
       }
       this.current = index;
+    },
+    openDetail: function() {
+      this.ismenu = false;
+      let mid = this.OpenMapData();
+      if (mid.curRow == null) return;
+      let rw = mid.MainTab[mid.curRow];
+      let val = rw[mid.KeyF];
+      let jsstr = {}; // '{"' + mid.KeyF + '":"' + val + '"}';
+      jsstr[mid.KeyF] = val;
+      let obj = {
+        Control: Finder,
+        Params: mid.KeyValue,
+        TextParams: jsstr, //JSON.parse(jsstr),
+        data: {}
+      };
+      let newid = this.id + "_" + val;
+      //mainObj.addform(newid, obj)
+      if (openMap.get(newid) == null) {
+        openMap.set(newid, obj);
+        openIDs.push(newid);
+      }
+      mainObj.current = newid;
+    },
+    csv: function() {
+      this.ismenu = false;
+      const url = baseUrl + "React/csv";
+      let bd = new FormData();
+      let mid = this.OpenMapData();
+      const IdDeclare = this.params;
+      bd.append("id", IdDeclare);
+      bd.append("Fc", JSON.stringify(mid.Fcols));
+      if (mid.SQLParams) bd.append("SQLParams", JSON.stringify(mid.SQLParams));
+      if (mid.TextParams)
+        bd.append("TextParams", JSON.stringify(mid.TextParams));
+
+      fetch(url, {
+        method: "POST",
+        mode: prodaction ? "no-cors" : "cors",
+        cache: "no-cache",
+        credentials: prodaction ? "include" : "omit",
+        body: bd
+      })
+        .then(res => res.blob())
+        .then(blob => {
+          let a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.setAttribute("download", "data.csv");
+          a.click();
+        });
     }
   },
   mounted: async function() {
@@ -243,6 +293,8 @@ export default {
     }
   }
 };
+
+export default Finder;
 </script>
 
 <style scoped>
