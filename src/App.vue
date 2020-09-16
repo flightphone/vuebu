@@ -14,7 +14,7 @@
 
     <v-navigation-drawer v-model="mainObj.drawer" absolute temporary width="auto">
       <p v-if="loading">Загрузка...</p>
-      <v-treeview v-else :items="treejson" :hoverable="hoverable" :open-on-click="openOnClick">
+      <v-treeview v-else :items="treejson" :hoverable="hoverable" :open-on-click="openOnClick" dense>
         <template slot="label" slot-scope="{ item }">
           <div @click="handleselect(item)">{{ item.text }}</div>
         </template>
