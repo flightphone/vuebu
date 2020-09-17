@@ -19,6 +19,19 @@
           <div @click="handleselect(item)">{{ item.text }}</div>
         </template>
       </v-treeview>
+      <v-list>
+          <v-list-item-group>
+            <v-divider/>
+            <v-list-item @click="exit()">
+                <v-list-item-icon>
+                  <v-icon>mdi-exit-to-app</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>Выход</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+          </v-list-item-group>
+        </v-list>  
     </v-navigation-drawer>
 
     <template v-for="item in openIDs">
@@ -32,6 +45,7 @@
 import { mainObj, openIDs, prodaction, baseUrl, openMap } from "./main";
 import Comp1 from "./components/Comp1.vue";
 import Finder from "./components/Finder.vue";
+import Dogovors from "./components/Dogovors.vue";
 
 export default {
   name: "App",
@@ -46,6 +60,10 @@ export default {
     };
   },
   methods: {
+    exit: function()
+    {
+      window.location = baseUrl + "Home/logout";
+    },
     handleselect: function(item) {
       if (!item.children) {
         //alert(item.attributes.link1);
@@ -78,6 +96,11 @@ export default {
       let control = p.params ? Finder : Comp1;
       let params = p.params;
       let SQLParams = null;
+
+      if (p.link1 == "RegulationPrint.Dgs.DogovorList")
+        control = Dogovors;
+      
+      /*
       if (p.link1 == "RegulationPrint.repSDM") {
         SQLParams = {
           "@DateStart": "2000-01-01",
@@ -92,6 +115,7 @@ export default {
           "@AL_UTG": "<Все>"
         };
       }
+      */
 
       return {
         Conrol: control,

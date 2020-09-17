@@ -5,6 +5,7 @@
         <v-app-bar-nav-icon @click="mainObj.drawer = true"></v-app-bar-nav-icon>
         <v-toolbar-title>{{Descr}}</v-toolbar-title>
         <v-spacer></v-spacer>
+        <slot></slot>
         <v-btn icon @click="ismenu = true">
           <v-icon>mdi-dots-vertical</v-icon>
         </v-btn>
@@ -81,7 +82,7 @@
                 </v-list-item-content>
               </v-list-item>
 
-              <v-list-item key="5" @click="ismenu=false" v-if="filterid!= null">
+              <v-list-item key="5" @click="ismenu=false" v-if="OpenMapData().IdDeclareSet">
                 <v-list-item-icon>
                   <v-icon>mdi-cog</v-icon>
                 </v-list-item-icon>
@@ -94,7 +95,7 @@
         </v-list>
       </v-navigation-drawer>
       <v-main>
-        <v-simple-table v-if="!load" fixed-header="true" dense>
+        <v-simple-table v-if="!load" fixed-header="true" dense >
           <template v-slot:default>
             <thead>
               <tr>
@@ -104,7 +105,7 @@
                 >{{column.FieldCaption}}</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody v-if="(nupdate > 0)">
               <tr
                 v-for="(row, index) in OpenMapData().MainTab"
                 :key="index"
@@ -126,7 +127,7 @@
         <v-toolbar-title>Фильтры, сортировка</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-btn icon @click="updateTab()">
-          <v-icon>mdi-content-save</v-icon>
+          <v-icon>mdi-check</v-icon>
         </v-btn>
         <v-btn icon @click="mode='grid'">
           <v-icon>mdi-window-close</v-icon>
@@ -169,6 +170,7 @@ let Finder = {
     ismenu: false,
     stateDrawer: false,
     action: 1,
+    nupdate: 1,
     items: ['Нет', 'По возрастанию', 'По убыванию'],
     rangSort:0
   }),
@@ -180,7 +182,7 @@ let Finder = {
     id: String,
     params: String,
     editid: Number,
-    filterid: String
+    //filterid: String
   },
   computed: {},
   methods: {
@@ -236,9 +238,11 @@ let Finder = {
     },
     handleClick: function(index) {
       this.OpenMapData().curRow = index;
+      /*
       if (openMap.get(this.id).data.setCurrent != null) {
         openMap.get(this.id).data.setCurrent(index);
       }
+      */
       this.current = index;
     },
     openDetail: function() {
@@ -335,9 +339,7 @@ let Finder = {
         return;
       }
       mid.MainTab.splice(mid.curRow, 1);
-      let c = this.current;
-      this.current = -1;
-      this.current = c;
+      this.nupdate = this.nupdate+1;
     },
     onChangePage: function(p) {
       this.action = this.action + 1;
@@ -372,13 +374,15 @@ let Finder = {
         mid.MainTab = data.MainTab;
         mid.TotalTab = data.TotalTab;
         mid.page = data.page;
+        //mid.curRow = 0;
+        //this.current = 0;
+        if (this.mode != "grid");
+          this.mode = "grid";
+        this.nupdate = this.nupdate+1;
+      
       }
 
-      if (this.mode != "grid");
-      this.mode = "grid";
-      this.OpenMapData().curRow = 0;
-      this.current = -1;
-      this.current = 0;
+      
     }
   },
   mounted: async function() {
@@ -388,7 +392,7 @@ let Finder = {
 
     const editid = this.editid;
     const IdDeclare = this.params;
-    const filterid = this.filterid;
+    //const filterid = this.filterid;
 
     if (editid != null) {
       OpenMapData().curRow = 0;
@@ -400,12 +404,14 @@ let Finder = {
     bd.append("id", IdDeclare);
 
     let mid = OpenMapId();
+    /*
     if (filterid != null && openMap.get(filterid) != null) {
       let fdat = openMap.get(filterid).data;
       fdat.ReferEdit.SaveFieldList.map(f => {
         mid.SQLParams["@" + f] = fdat.MainTab[0][f];
       });
     }
+    */
 
     if (mid.SQLParams) {
       bd.append("SQLParams", JSON.stringify(mid.SQLParams));
