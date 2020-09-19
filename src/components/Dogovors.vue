@@ -1,5 +1,5 @@
 <template>
-    <Finder :id="id" :visible="visible" :params="params">
+    <Finder :id="id" :visible="visible" :params="params" ref="dogFind">
         <template>
             <a target="_blanck" hidden ref="fileLink"></a>
         <v-btn icon @click="openfile()">

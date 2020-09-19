@@ -31,24 +31,28 @@
   </v-app-bar>
 </template>
 <script>
-import { openMap } from "../main";
+//import { openMap } from "../main";
 
 export default {
   name: "Pagination",
   data: () => ({
-    openMap: openMap,
+    //openMap: openMap,
     rowsPerPage: 30
   }),
   props: {
-    id: String,
-    editid: Number
+    //id: String,
+    //editid: Number
+    findData:Object
   },
   methods: {
     OpenMapData: function() {
+      /*
       if (this.editid == null) return openMap.get(this.id).data;
       else
         return openMap.get(this.id).data.ReferEdit.Editors[this.editid].joinRow
           .FindConrol;
+      */
+       return this.findData;    
     },
     count: function() {
       if (this.OpenMapData().TotalTab)

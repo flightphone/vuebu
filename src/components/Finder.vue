@@ -10,13 +10,13 @@
           <v-icon>mdi-dots-vertical</v-icon>
         </v-btn>
       </v-app-bar>
-      <Pagination :id="id" :editid="editid" v-if="stateDrawer" />
+      <Pagination :findData="OpenMapData()" v-if="stateDrawer" />
 
       <v-navigation-drawer v-model="ismenu" temporary absolute width="auto">
         <v-list>
           <v-list-item-group>
             <template v-if="(editid==null) && (OpenMapData().EditProc) && !load">
-              <v-list-item key="6" @click="ismenu=false">
+              <v-list-item key="6" @click="ismenu=false;add();">
                 <v-list-item-icon>
                   <v-icon>mdi-plus</v-icon>
                 </v-list-item-icon>
@@ -25,7 +25,7 @@
                 </v-list-item-content>
               </v-list-item>
 
-              <v-list-item key="7" @click="ismenu=false">
+              <v-list-item key="7" @click="ismenu=false;edit()">
                 <v-list-item-icon>
                   <v-icon>mdi-pencil</v-icon>
                 </v-list-item-icon>
@@ -81,21 +81,21 @@
                   <v-list-item-title>Детали</v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
-
-              <v-list-item key="5" @click="ismenu=false" v-if="OpenMapData().IdDeclareSet">
-                <v-list-item-icon>
-                  <v-icon>mdi-cog</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
-                  <v-list-item-title>Параметры</v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
             </template>
+
+            <v-list-item key="5" @click="ismenu=false" v-if="OpenMapData().IdDeclareSet && !load">
+              <v-list-item-icon>
+                <v-icon>mdi-cog</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>Параметры</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
           </v-list-item-group>
         </v-list>
       </v-navigation-drawer>
       <v-main>
-        <v-simple-table v-if="!load" fixed-header="true" dense >
+        <v-simple-table v-if="!load" dense>
           <template v-slot:default>
             <thead>
               <tr>
@@ -141,25 +141,46 @@
                 <td>
                   <v-text-field :label="column.FieldCaption" v-model="column.FindString"></v-text-field>
                 </td>
-                <td>{{column.SortOrder}} <span hidden>{{rangSort}}</span></td>
                 <td>
-                  <v-select :items="items" v-model="column.Sort" @change="(event)=>sortChange(event, index)"></v-select>
+                  {{column.SortOrder}}
+                  <span hidden>{{rangSort}}</span>
                 </td>
-                
+                <td>
+                  <v-select
+                    :items="items"
+                    v-model="column.Sort"
+                    @change="(event)=>sortChange(event, index)"
+                  ></v-select>
+                </td>
               </tr>
             </tbody>
           </template>
         </v-simple-table>
       </v-main>
     </div>
+    <div
+      v-bind:hidden="!(mode == 'edit' || mode == 'add')"
+      style="height:100vh;maxheight:100vh;overflow:auto"
+    >
+      <Editor
+        v-if="(editid == null) && !load && (OpenMapData().EditProc)"
+        :save="save"
+        :closeEditor="closeEditor"
+        :action="mode"
+        :findData="OpenMapData()"
+        :uid="uid"
+      />
+    </div>
   </div>
 </template>
 <script>
+//:id="id" :editid="editid"
 import { mainObj, openMap, openIDs, prodaction, baseUrl } from "../main";
 import Pagination from "./Pagination";
+import Editor from "./Editor";
 let Finder = {
   name: "Finder",
-  components: { Pagination },
+  components: { Pagination, Editor },
   data: () => ({
     mainObj: mainObj,
     openMap: openMap,
@@ -171,8 +192,9 @@ let Finder = {
     stateDrawer: false,
     action: 1,
     nupdate: 1,
-    items: ['Нет', 'По возрастанию', 'По убыванию'],
-    rangSort:0
+    items: ["Нет", "По возрастанию", "По убыванию"],
+    rangSort: 0,
+    uid: "-1"
   }),
   props: {
     visible: {
@@ -182,23 +204,20 @@ let Finder = {
     id: String,
     params: String,
     editid: Number,
-    //filterid: String
+    findData: Object
   },
   computed: {},
   methods: {
-    sortChange: function(event, index)
-    {
+    sortChange: function(event, index) {
       let rang = 0;
       let columns = this.OpenMapData().Fcols;
-        columns.map((column, i)=>{
-            if (i!=index && column.SortOrder)    
-                if (column.SortOrder > rang)
-                    rang = column.SortOrder;
-        });
-        columns[index].SortOrder = rang+1;
-        this.rangSort = rang+1;
-        //columns[index].Sort = event.target.value;
-        
+      columns.map((column, i) => {
+        if (i != index && column.SortOrder)
+          if (column.SortOrder > rang) rang = column.SortOrder;
+      });
+      columns[index].SortOrder = rang + 1;
+      this.rangSort = rang + 1;
+      //columns[index].Sort = event.target.value;
     },
     dateformat: function(d, f) {
       if (!d) return d;
@@ -225,10 +244,8 @@ let Finder = {
     },
 
     OpenMapData: function() {
-      if (this.editid == null) return openMap.get(this.id).data;
-      else
-        return openMap.get(this.id).data.ReferEdit.Editors[this.editid].joinRow
-          .FindConrol;
+      if (this.id != null) return openMap.get(this.id).data;
+      else return this.findData;
     },
     OpenMapId: function() {
       return openMap.get(this.id);
@@ -238,11 +255,6 @@ let Finder = {
     },
     handleClick: function(index) {
       this.OpenMapData().curRow = index;
-      /*
-      if (openMap.get(this.id).data.setCurrent != null) {
-        openMap.get(this.id).data.setCurrent(index);
-      }
-      */
       this.current = index;
     },
     openDetail: function() {
@@ -339,7 +351,7 @@ let Finder = {
         return;
       }
       mid.MainTab.splice(mid.curRow, 1);
-      this.nupdate = this.nupdate+1;
+      this.nupdate = this.nupdate + 1;
     },
     onChangePage: function(p) {
       this.action = this.action + 1;
@@ -374,15 +386,44 @@ let Finder = {
         mid.MainTab = data.MainTab;
         mid.TotalTab = data.TotalTab;
         mid.page = data.page;
-        //mid.curRow = 0;
-        //this.current = 0;
         if (this.mode != "grid");
-          this.mode = "grid";
-        this.nupdate = this.nupdate+1;
-      
+        this.mode = "grid";
+        this.nupdate = this.nupdate + 1;
       }
-
-      
+    },
+    save: function() {
+      this.mode = "grid";
+    },
+    closeEditor: function() {
+      this.mode = "grid";
+    },
+    add: function() {
+      let data = this.OpenMapData();
+      data.WorkRow = {};
+      data.ColumnTab.map(column => {
+        data.WorkRow[column] = "";
+      });
+      this.uid = "-1";
+      this.mode = "add";
+    },
+    edit: function() {
+      let data = this.OpenMapData();
+      data.WorkRow = {};
+      let c = data.curRow;
+      let row = data.MainTab[c];
+      data.ColumnTab.map(column => {
+        data.WorkRow[column] = row[column] == null ? "" : row[column];
+      });
+      data.ReferEdit.Editors.map(column => {
+        if (column.DisplayFormat != "") {
+          data.WorkRow[column.FieldName] = this.dateformat(
+            data.WorkRow[column.FieldName],
+            column.DisplayFormat
+          );
+        }
+      });
+      this.uid = row[data.KeyF];
+      this.mode = "edit";
     }
   },
   mounted: async function() {
@@ -396,6 +437,7 @@ let Finder = {
 
     if (editid != null) {
       OpenMapData().curRow = 0;
+      this.Descr = OpenMapData().Descr;
       setLoad(false);
       return;
     }
