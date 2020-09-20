@@ -15,20 +15,21 @@
       <v-main>
         <v-simple-table v-if="!load" dense>
           <template v-slot:default>
-            <tbody v-if="(nupdate > 0) && uid != '-#-'">
+            <tbody v-if="(nupdate > 0) && uid !=''">
               <tr v-for="(column, index) in findData.ReferEdit.Editors" :key="index">
                 <td>
-                  <v-text-field
+                  <v-text-field 
                     v-if="column.joinRow==null"
                     :label="column.FieldCaption"
-                    :key="column.FieldName"
+                    :key="column.FieldName + uid"
                     v-model="findData.WorkRow[column.FieldName]"
+                    @change="(event)=>textChange(event, column.FieldName)"
                   ></v-text-field>
                   <template v-else>
                     <v-text-field
                       v-if="column.joinRow.classname == 'Bureau.Finder'"
                       :label="column.FieldCaption"
-                      :key="column.FieldName"
+                      :key="column.FieldName + uid"
                       v-model="findData.WorkRow[column.FieldName]"
                       append-icon="mdi-magnify"
                       @click:append="open(index)"
@@ -40,8 +41,8 @@
                       :items="column.joinRow.FindConrol.MainTab"
                       :item-value="column.joinRow.keyField"
                       :item-text="column.joinRow.FindConrol.DispField"
+                      :key="column.FieldName + uid"
                       v-model="findData.WorkRow[column.joinRow.valField]"
-                      @change="(event)=>sortChange(event, column)"
                     ></v-select>
                   </template>
                 </td>
@@ -119,6 +120,10 @@ export default {
     },
     clearFinder: function() {
       this.mode = "edit";
+    },
+    textChange: function(event, index) {
+        this.findData.WorkRow[index] = event;
+        
     }
   }
 };

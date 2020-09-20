@@ -206,6 +206,7 @@
 import { mainObj, openMap, openIDs, prodaction, baseUrl } from "../main";
 import Pagination from "./Pagination";
 import Editor from "./Editor";
+
 let Finder = {
   name: "Finder",
   components: { Pagination, Editor },
@@ -220,10 +221,11 @@ let Finder = {
     stateDrawer: false,
     action: 1,
     nupdate: 1,
+    nadd: 1,
     items: ["Нет", "По возрастанию", "По убыванию"],
     rangSort: 0,
-    uid: "-1",
-    uid2: "-1"
+    uid: "zz",
+    uid2: "yy"
   }),
   props: {
     visible: {
@@ -498,16 +500,19 @@ let Finder = {
     },
     add: function() {
       let data = this.OpenMapData();
-      data.WorkRow = {};
+      if (data.WorkRow == null)
+          data.WorkRow = {};
       data.ColumnTab.map(column => {
         data.WorkRow[column] = "";
-      });
-      this.uid = "-1";
+      }); 
+      this.nadd = this.nadd + 1;
+      this.uid = "addrec" + this.nadd.toString();
       this.mode = "add";
     },
     edit: function() {
       let data = this.OpenMapData();
-      data.WorkRow = {};
+      if (data.WorkRow == null)
+          data.WorkRow = {};
       let c = data.curRow;
       let row = data.MainTab[c];
       data.ColumnTab.map(column => {
