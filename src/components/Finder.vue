@@ -1,18 +1,27 @@
 <template>
   <div v-bind:hidden="!visible" style="height:100vh;maxheight:100vh;overflow:auto">
-    <div v-bind:hidden="mode!='grid'" style="height:100vh;maxheight:100vh;overflow:auto">
-      <v-app-bar app color="primary" dark v-if="!stateDrawer">
-        <v-app-bar-nav-icon @click="mainObj.drawer = true"></v-app-bar-nav-icon>
+    <div v-bind:hidden="mode!='grid'" style="height:100vh;maxheight:100vh;overflow:auto">    
+      
+    
+      <v-app-bar app color="primary" dark v-if="!stateDrawer" max-width="100vw">
+        <v-app-bar-nav-icon v-if="(editid == null)" @click="mainObj.drawer = true"></v-app-bar-nav-icon>
         <v-toolbar-title>{{Descr}}</v-toolbar-title>
         <v-spacer></v-spacer>
+        <template v-if="(editid != null)">
+          <v-btn icon @click="selectFinder(editid)">
+            <v-icon>mdi-check</v-icon>
+          </v-btn>
+          <v-btn icon @click="clearFinder()">
+            <v-icon>mdi-window-close</v-icon>
+          </v-btn>
+        </template>
         <slot></slot>
         <v-btn icon @click="ismenu = true">
           <v-icon>mdi-dots-vertical</v-icon>
         </v-btn>
       </v-app-bar>
-      <Pagination :findData="OpenMapData()" v-if="stateDrawer" />
-
-      <v-navigation-drawer v-model="ismenu" temporary absolute width="auto">
+      
+      <v-navigation-drawer v-model="ismenu" absolute temporary width="300" left>
         <v-list>
           <v-list-item-group>
             <template v-if="(editid==null) && (OpenMapData().EditProc) && !load">
@@ -83,7 +92,7 @@
               </v-list-item>
             </template>
 
-            <v-list-item key="5" @click="ismenu=false" v-if="OpenMapData().IdDeclareSet && !load">
+            <v-list-item key="5" @click="ismenu=false;editSetting()" v-if="OpenMapData().IdDeclareSet && !load">
               <v-list-item-icon>
                 <v-icon>mdi-cog</v-icon>
               </v-list-item-icon>
@@ -94,6 +103,12 @@
           </v-list-item-group>
         </v-list>
       </v-navigation-drawer>
+      
+      
+      
+      <Pagination :findData="OpenMapData()" v-if="stateDrawer" />
+
+      
       <v-main>
         <v-simple-table v-if="!load" dense>
           <template v-slot:default>
@@ -123,7 +138,7 @@
       </v-main>
     </div>
     <div v-bind:hidden="mode!='filter'" style="height:100vh;maxheight:100vh;overflow:auto">
-      <v-app-bar app color="primary" dark>
+      <v-app-bar app color="primary" dark max-width="100vw">
         <v-toolbar-title>Фильтры, сортировка</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-btn icon @click="updateTab()">
@@ -171,6 +186,19 @@
         :uid="uid"
       />
     </div>
+    <div
+      v-bind:hidden="!(mode=='setting')"
+      style="height:100vh;maxheight:100vh;overflow:auto"
+    >
+      <Editor
+        v-if="OpenMapData().IdDeclareSet && !load"
+        :save="saveSetting"
+        :closeEditor="closeEditor"
+        :action="mode"
+        :findData="OpenMapData().Setting"
+        :uid="uid2"
+      />
+    </div>
   </div>
 </template>
 <script>
@@ -194,7 +222,8 @@ let Finder = {
     nupdate: 1,
     items: ["Нет", "По возрастанию", "По убыванию"],
     rangSort: 0,
-    uid: "-1"
+    uid: "-1",
+    uid2: "-1"
   }),
   props: {
     visible: {
@@ -204,7 +233,9 @@ let Finder = {
     id: String,
     params: String,
     editid: Number,
-    findData: Object
+    findData: Object,
+    selectFinder: Function,
+    clearFinder: Function
   },
   computed: {},
   methods: {
@@ -391,8 +422,76 @@ let Finder = {
         this.nupdate = this.nupdate + 1;
       }
     },
-    save: function() {
+    saveSetting: function(){
+
+        let data = this.OpenMapData().Setting;
+        let row = data.MainTab[0];
+        data.ColumnTab.map((column) => {
+            row[column] = data.WorkRow[column];
+        });
+
+        let mid = this.OpenMapData();
+        data.ReferEdit.SaveFieldList.map((f) => {
+            mid.SQLParams["@" + f] = data.MainTab[0][f];
+        });
+        this.updateTab();
+    },
+    save: async function() {
+      let data = this.OpenMapData();
+      //default values
+      for (let f in data.DefaultValues) {
+        data.WorkRow[f] = data.DefaultValues[f];
+      }
+
+      for (let f in data.TextParams) {
+        data.WorkRow[f] = data.TextParams[f];
+      }
+
+      let SQLParams = {};
+      data.ReferEdit.SaveFieldList.map(f => {
+        SQLParams[f] = data.WorkRow[f];
+      });
+
+      const url = baseUrl + "React/exec";
+      let bd = new FormData();
+
+      bd.append("EditProc", data.EditProc);
+      bd.append("SQLParams", JSON.stringify(SQLParams));
+      bd.append("KeyF", data.KeyF);
+
+      const response = await fetch(url, {
+        method: "POST",
+        mode: prodaction ? "no-cors" : "cors",
+        cache: "no-cache",
+        credentials: prodaction ? "include" : "omit",
+        body: bd
+      });
+
+      const res = await response.json();
+      if (res.message != "OK") {
+        mainObj.alert("Ошибка", res.message);
+        return;
+      } else {
+        if (res.ColumnTab.length == 1) {
+          data.WorkRow[data.KeyF] = res.MainTab[0][res.ColumnTab[0]];
+        } else {
+          res.ColumnTab.map(column => {
+            data.WorkRow[column] = res.MainTab[0][column];
+          });
+        }
+      }
+
+      let row = {};
+      if (this.mode == "edit") {
+        let c = data.curRow;
+        row = data.MainTab[c];
+      }
+      data.ColumnTab.map(column => {
+        row[column] = data.WorkRow[column];
+      });
+      if (this.mode == "add") data.MainTab.push(row);
       this.mode = "grid";
+      this.nupdate = this.nupdate + 1;
     },
     closeEditor: function() {
       this.mode = "grid";
@@ -424,6 +523,16 @@ let Finder = {
       });
       this.uid = row[data.KeyF];
       this.mode = "edit";
+    },
+    editSetting: function(){
+        let data = this.OpenMapData().Setting;
+        data.WorkRow = {};
+        let row = data.MainTab[0];
+        data.ColumnTab.map((column) => {
+            data.WorkRow[column] = (row[column] == null) ? "" : row[column];
+        });
+        this.uid2 = "-10";
+        this.mode = "setting";
     }
   },
   mounted: async function() {
@@ -437,7 +546,7 @@ let Finder = {
 
     if (editid != null) {
       OpenMapData().curRow = 0;
-      this.Descr = OpenMapData().Descr;
+      this.Descr = OpenMapData().Descr + " (выбор)";
       setLoad(false);
       return;
     }
