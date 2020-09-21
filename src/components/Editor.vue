@@ -13,7 +13,7 @@
         </v-btn>
       </v-app-bar>
       <v-main>
-        <v-simple-table v-if="!load" dense>
+        <v-simple-table v-if="!load">
           <template v-slot:default>
             <tbody v-if="(nupdate > 0) && uid !=''">
               <tr v-for="(column, index) in findData.ReferEdit.Editors" :key="index">
