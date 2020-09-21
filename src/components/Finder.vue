@@ -1,8 +1,6 @@
 <template>
   <div v-bind:hidden="!visible" style="height:100vh;maxheight:100vh;overflow:auto">
-    <div v-bind:hidden="mode!='grid'" style="height:100vh;maxheight:100vh;overflow:auto">    
-      
-    
+    <div v-bind:hidden="mode!='grid'" style="height:100vh;maxheight:100vh;overflow:auto">
       <v-app-bar app color="primary" dark v-if="!stateDrawer" max-width="100vw">
         <v-app-bar-nav-icon v-if="(editid == null)" @click="mainObj.drawer = true"></v-app-bar-nav-icon>
         <v-toolbar-title>{{Descr}}</v-toolbar-title>
@@ -16,99 +14,101 @@
           </v-btn>
         </template>
         <slot></slot>
-        <v-btn icon @click="ismenu = true">
-          <v-icon>mdi-dots-vertical</v-icon>
-        </v-btn>
+        <v-menu left>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn icon v-bind="attrs" v-on="on">
+              <v-icon>mdi-dots-vertical</v-icon>
+            </v-btn>
+          </template>
+          <v-list>
+            <v-list-item-group>
+              <template v-if="(editid==null) && (OpenMapData().EditProc) && !load">
+                <v-list-item key="6" @click="add();">
+                  <v-list-item-icon>
+                    <v-icon>mdi-plus</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    <v-list-item-title>Добавить</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+
+                <v-list-item key="7" @click="edit()">
+                  <v-list-item-icon>
+                    <v-icon>mdi-pencil</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    <v-list-item-title>Редактировать</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+
+                <v-list-item key="8" @click="confirmDelete()">
+                  <v-list-item-icon>
+                    <v-icon>mdi-delete</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    <v-list-item-title>Удалить</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+              </template>
+              <template v-if="!load">
+                <v-list-item key="1" @click="mode='filter'">
+                  <v-list-item-icon>
+                    <v-icon>mdi-filter-menu</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    <v-list-item-title>Фильтровка и сортировка</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+
+                <v-list-item key="2" @click="stateDrawer=true">
+                  <v-list-item-icon>
+                    <v-icon>mdi-code-tags</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    <v-list-item-title>Страницы</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+              </template>
+
+              <template v-if="(editid==null) && !load">
+                <v-list-item key="3" @click="csv()">
+                  <v-list-item-icon>
+                    <v-icon>mdi-cloud-download</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    <v-list-item-title>Экспорт в CSV</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+
+                <v-list-item key="4" @click="openDetail()" v-if="OpenMapData().KeyValue">
+                  <v-list-item-icon>
+                    <v-icon>mdi-details</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    <v-list-item-title>Детали</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+              </template>
+
+              <v-list-item
+                key="5"
+                @click="editSetting()"
+                v-if="OpenMapData().IdDeclareSet && !load"
+              >
+                <v-list-item-icon>
+                  <v-icon>mdi-cog</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>Параметры</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+            </v-list-item-group>
+          </v-list>
+        </v-menu>
       </v-app-bar>
-      
-      <v-navigation-drawer v-model="ismenu" absolute temporary width="300" left>
-        <v-list>
-          <v-list-item-group>
-            <template v-if="(editid==null) && (OpenMapData().EditProc) && !load">
-              <v-list-item key="6" @click="ismenu=false;add();">
-                <v-list-item-icon>
-                  <v-icon>mdi-plus</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
-                  <v-list-item-title>Добавить</v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
 
-              <v-list-item key="7" @click="ismenu=false;edit()">
-                <v-list-item-icon>
-                  <v-icon>mdi-pencil</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
-                  <v-list-item-title>Редактировать</v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-
-              <v-list-item key="8" @click="confirmDelete()">
-                <v-list-item-icon>
-                  <v-icon>mdi-delete</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
-                  <v-list-item-title>Удалить</v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-            </template>
-            <template v-if="!load">
-              <v-list-item key="1" @click="ismenu=false;mode='filter'">
-                <v-list-item-icon>
-                  <v-icon>mdi-filter-menu</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
-                  <v-list-item-title>Фильтровка и сортировка</v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-
-              <v-list-item key="2" @click="ismenu=false;stateDrawer=true">
-                <v-list-item-icon>
-                  <v-icon>mdi-code-tags</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
-                  <v-list-item-title>Страницы</v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-            </template>
-
-            <template v-if="(editid==null) && !load">
-              <v-list-item key="3" @click="csv()">
-                <v-list-item-icon>
-                  <v-icon>mdi-cloud-download</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
-                  <v-list-item-title>Экспорт в CSV</v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-
-              <v-list-item key="4" @click="openDetail()" v-if="OpenMapData().KeyValue">
-                <v-list-item-icon>
-                  <v-icon>mdi-details</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
-                  <v-list-item-title>Детали</v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-            </template>
-
-            <v-list-item key="5" @click="ismenu=false;editSetting()" v-if="OpenMapData().IdDeclareSet && !load">
-              <v-list-item-icon>
-                <v-icon>mdi-cog</v-icon>
-              </v-list-item-icon>
-              <v-list-item-content>
-                <v-list-item-title>Параметры</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list-item-group>
-        </v-list>
-      </v-navigation-drawer>
-      
-      
-      
       <Pagination :findData="OpenMapData()" v-if="stateDrawer" />
 
-      
       <v-main>
         <v-simple-table v-if="!load" dense>
           <template v-slot:default>
@@ -186,10 +186,7 @@
         :uid="uid"
       />
     </div>
-    <div
-      v-bind:hidden="!(mode=='setting')"
-      style="height:100vh;maxheight:100vh;overflow:auto"
-    >
+    <div v-bind:hidden="!(mode=='setting')" style="height:100vh;maxheight:100vh;overflow:auto">
       <Editor
         v-if="OpenMapData().IdDeclareSet && !load"
         :save="saveSetting"
@@ -217,7 +214,6 @@ let Finder = {
     mode: "grid",
     Descr: "Загрузка...",
     current: 0,
-    ismenu: false,
     stateDrawer: false,
     action: 1,
     nupdate: 1,
@@ -291,7 +287,6 @@ let Finder = {
       this.current = index;
     },
     openDetail: function() {
-      this.ismenu = false;
       let mid = this.OpenMapData();
       if (mid.curRow == null) return;
       let rw = mid.MainTab[mid.curRow];
@@ -312,7 +307,6 @@ let Finder = {
       mainObj.current = newid;
     },
     csv: function() {
-      this.ismenu = false;
       const url = baseUrl + "React/csv";
       let bd = new FormData();
       let mid = this.OpenMapData();
@@ -340,7 +334,6 @@ let Finder = {
     },
 
     confirmDelete: function() {
-      this.ismenu = false;
       let mid = this.OpenMapData();
       if (mid.curRow == null) return;
       let rw = mid.MainTab[mid.curRow];
@@ -424,19 +417,18 @@ let Finder = {
         this.nupdate = this.nupdate + 1;
       }
     },
-    saveSetting: function(){
+    saveSetting: function() {
+      let data = this.OpenMapData().Setting;
+      let row = data.MainTab[0];
+      data.ColumnTab.map(column => {
+        row[column] = data.WorkRow[column];
+      });
 
-        let data = this.OpenMapData().Setting;
-        let row = data.MainTab[0];
-        data.ColumnTab.map((column) => {
-            row[column] = data.WorkRow[column];
-        });
-
-        let mid = this.OpenMapData();
-        data.ReferEdit.SaveFieldList.map((f) => {
-            mid.SQLParams["@" + f] = data.MainTab[0][f];
-        });
-        this.updateTab();
+      let mid = this.OpenMapData();
+      data.ReferEdit.SaveFieldList.map(f => {
+        mid.SQLParams["@" + f] = data.MainTab[0][f];
+      });
+      this.updateTab();
     },
     save: async function() {
       let data = this.OpenMapData();
@@ -500,19 +492,17 @@ let Finder = {
     },
     add: function() {
       let data = this.OpenMapData();
-      if (data.WorkRow == null)
-          data.WorkRow = {};
+      if (data.WorkRow == null) data.WorkRow = {};
       data.ColumnTab.map(column => {
         data.WorkRow[column] = "";
-      }); 
+      });
       this.nadd = this.nadd + 1;
       this.uid = "addrec" + this.nadd.toString();
       this.mode = "add";
     },
     edit: function() {
       let data = this.OpenMapData();
-      if (data.WorkRow == null)
-          data.WorkRow = {};
+      if (data.WorkRow == null) data.WorkRow = {};
       let c = data.curRow;
       let row = data.MainTab[c];
       data.ColumnTab.map(column => {
@@ -529,15 +519,15 @@ let Finder = {
       this.uid = row[data.KeyF];
       this.mode = "edit";
     },
-    editSetting: function(){
-        let data = this.OpenMapData().Setting;
-        data.WorkRow = {};
-        let row = data.MainTab[0];
-        data.ColumnTab.map((column) => {
-            data.WorkRow[column] = (row[column] == null) ? "" : row[column];
-        });
-        this.uid2 = "-10";
-        this.mode = "setting";
+    editSetting: function() {
+      let data = this.OpenMapData().Setting;
+      data.WorkRow = {};
+      let row = data.MainTab[0];
+      data.ColumnTab.map(column => {
+        data.WorkRow[column] = row[column] == null ? "" : row[column];
+      });
+      this.uid2 = "-10";
+      this.mode = "setting";
     }
   },
   mounted: async function() {
