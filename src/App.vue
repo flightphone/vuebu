@@ -12,7 +12,7 @@
       </v-card>
     </v-dialog>
 
-    <v-navigation-drawer v-model="mainObj.drawer" absolute temporary width="auto">
+    <v-navigation-drawer v-model="mainObj.drawer" absolute temporary width="auto" left>
       <p v-if="loading">Загрузка...</p>
       <v-treeview v-else :items="treejson" :hoverable="hoverable" :open-on-click="openOnClick" dense>
         <template slot="label" slot-scope="{ item }">
@@ -100,23 +100,6 @@ export default {
       if (p.link1 == "RegulationPrint.Dgs.DogovorList")
         control = Dogovors;
       
-      /*
-      if (p.link1 == "RegulationPrint.repSDM") {
-        SQLParams = {
-          "@DateStart": "2000-01-01",
-          "@DateFinish": "2099-01-01"
-        };
-      }
-
-      if (p.link1 == "RegulationPrint.ServiceReport") {
-        SQLParams = {
-          "@DateStart": "2000-01-01",
-          "@DateFinish": "2099-01-01",
-          "@AL_UTG": "<Все>"
-        };
-      }
-      */
-
       return {
         Conrol: control,
         Params: params,
