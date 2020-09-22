@@ -7,31 +7,43 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="green darken-1" text @click="handleClose()">ОК</v-btn>
-          <v-btn v-if="mainObj.alertConfirm" color="green darken-1" text @click="mainObj.openAlert = false">Отмена</v-btn>
+          <v-btn
+            v-if="mainObj.alertConfirm"
+            color="green darken-1"
+            text
+            @click="mainObj.openAlert = false"
+          >Отмена</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
 
     <v-navigation-drawer v-model="mainObj.drawer" absolute temporary width="auto" left>
-      <p v-if="loading">Загрузка...</p>
-      <v-treeview v-else :items="treejson" :hoverable="hoverable" :open-on-click="openOnClick" dense>
-        <template slot="label" slot-scope="{ item }">
-          <div @click="handleselect(item)">{{ item.text }}</div>
-        </template>
-      </v-treeview>
-      <v-list>
-          <v-list-item-group>
-            <v-divider/>
-            <v-list-item @click="exit()">
-                <v-list-item-icon>
-                  <v-icon>mdi-exit-to-app</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
-                  <v-list-item-title>Выход</v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-          </v-list-item-group>
-        </v-list>  
+      <v-app-bar app>
+        <v-btn icon>
+          <v-icon>mdi-chevron-left</v-icon>
+        </v-btn>
+        <v-btn icon>
+          <v-icon>mdi-chevron-right</v-icon>
+        </v-btn>
+        <v-spacer></v-spacer>
+        <v-btn icon @click="exit()">
+          <v-icon>mdi-exit-to-app</v-icon>
+        </v-btn>
+      </v-app-bar>
+      <v-main>
+        <p v-if="loading">Загрузка...</p>
+        <v-treeview
+          v-else
+          :items="treejson"
+          :hoverable="hoverable"
+          :open-on-click="openOnClick"
+          dense
+        >
+          <template slot="label" slot-scope="{ item }">
+            <div @click="handleselect(item)">{{ item.text }}</div>
+          </template>
+        </v-treeview>
+      </v-main>
     </v-navigation-drawer>
 
     <template v-for="item in openIDs">
@@ -60,8 +72,7 @@ export default {
     };
   },
   methods: {
-    exit: function()
-    {
+    exit: function() {
       window.location = baseUrl + "Home/logout";
     },
     handleselect: function(item) {
@@ -97,9 +108,8 @@ export default {
       let params = p.params;
       let SQLParams = null;
 
-      if (p.link1 == "RegulationPrint.Dgs.DogovorList")
-        control = Dogovors;
-      
+      if (p.link1 == "RegulationPrint.Dgs.DogovorList") control = Dogovors;
+
       return {
         Conrol: control,
         Params: params,

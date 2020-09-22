@@ -594,7 +594,7 @@ export default Finder;
 
 <style scoped>
 .selected {
-  background-color: lightcoral;
-  color: lightskyblue;
+  background-color: #C2185B;
+    color: lightblue;
 }
 </style>
