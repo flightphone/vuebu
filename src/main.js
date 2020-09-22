@@ -23,7 +23,9 @@ let mainObj = {
     this.alertText = text;
     this.confirmAction = action;
     this.openAlert = true;
-  }
+  },
+  history: ["-1"],
+  curhistory: 0
   
 }; 
 const prodaction = false;

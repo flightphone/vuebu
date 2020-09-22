@@ -19,10 +19,10 @@
 
     <v-navigation-drawer v-model="mainObj.drawer" absolute temporary width="auto" left>
       <v-app-bar app>
-        <v-btn icon>
+        <v-btn icon @click="back()" :disabled="!(mainObj.curhistory > 0)">
           <v-icon>mdi-chevron-left</v-icon>
         </v-btn>
-        <v-btn icon>
+        <v-btn icon @click="next()" :disabled="!(mainObj.curhistory < mainObj.history.length-1)">
           <v-icon>mdi-chevron-right</v-icon>
         </v-btn>
         <v-spacer></v-spacer>
@@ -72,6 +72,22 @@ export default {
     };
   },
   methods: {
+    back: function() {
+      //mainObj.alert("test", mainObj.curhistory);
+      if (mainObj.curhistory > 0) {
+        mainObj.curhistory = mainObj.curhistory - 1;
+        mainObj.drawer = false;
+        mainObj.current = mainObj.history[mainObj.curhistory];
+      }
+    },
+    next: function() {
+      if (mainObj.curhistory < mainObj.history.length-1) {
+        mainObj.curhistory = mainObj.curhistory + 1;
+        mainObj.drawer = false;
+        mainObj.current = mainObj.history[mainObj.curhistory];
+
+      }
+    },
     exit: function() {
       window.location = baseUrl + "Home/logout";
     },
@@ -101,6 +117,9 @@ export default {
       }
       //Setcurrent(id);
       mainObj.current = id;
+      mainObj.curhistory = mainObj.curhistory + 1;
+      mainObj.history.splice(mainObj.curhistory, mainObj.history.length, id);
+
     },
     getForm: function(item) {
       let p = item.attributes;

@@ -297,6 +297,7 @@ let Finder = {
         Control: Finder,
         Params: mid.KeyValue,
         TextParams: jsstr,
+        title: rw[mid.DispField],
         data: {}
       };
       let newid = this.id + "_" + val;
@@ -305,6 +306,8 @@ let Finder = {
         openIDs.push(newid);
       }
       mainObj.current = newid;
+      mainObj.curhistory = mainObj.curhistory + 1;
+      mainObj.history.splice(mainObj.curhistory, mainObj.history.length, newid);
     },
     csv: function() {
       const url = baseUrl + "React/csv";
@@ -585,6 +588,9 @@ let Finder = {
       let v = OpenMapId();
       v.data = data;
       this.Descr = data.Descr;
+      if (mid.title)
+        this.Descr = this.Descr + " (" + mid.title + ")";
+
       setLoad(false);
     }
   }
