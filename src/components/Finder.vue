@@ -497,7 +497,7 @@ let Finder = {
         data.WorkRow[column] = "";
       });
       this.nadd = this.nadd + 1;
-      this.uid = "addrec" + this.nadd.toString();
+      this.uid = "uid" + this.nadd.toString();
       this.mode = "add";
     },
     edit: function() {
@@ -516,7 +516,8 @@ let Finder = {
           );
         }
       });
-      this.uid = row[data.KeyF];
+      this.nadd = this.nadd + 1;
+      this.uid = "uid" + this.nadd.toString();
       this.mode = "edit";
     },
     editSetting: function() {
