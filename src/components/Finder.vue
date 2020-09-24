@@ -22,8 +22,8 @@
           </template>
           <v-list>
             <v-list-item-group>
-              <template v-if="(editid==null) && (OpenMapData().EditProc) && !load">
-                <v-list-item key="6" @click="add();">
+              <template v-if="(editid==null) && !load">
+                <v-list-item key="6" @click="add();" v-if="(OpenMapData().EditProc)">
                   <v-list-item-icon>
                     <v-icon>mdi-plus</v-icon>
                   </v-list-item-icon>
@@ -34,14 +34,16 @@
 
                 <v-list-item key="7" @click="edit()">
                   <v-list-item-icon>
-                    <v-icon>mdi-pencil</v-icon>
+                    <v-icon v-if="(OpenMapData().EditProc)">mdi-pencil</v-icon>
+                    <v-icon v-else>mdi-magnify</v-icon>
                   </v-list-item-icon>
                   <v-list-item-content>
-                    <v-list-item-title>Редактировать</v-list-item-title>
+                    <v-list-item-title v-if="(OpenMapData().EditProc)">Редактировать</v-list-item-title>
+                    <v-list-item-title v-else>Просмотр</v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
 
-                <v-list-item key="8" @click="confirmDelete()">
+                <v-list-item key="8" @click="confirmDelete()" v-if="(OpenMapData().DelProc)">
                   <v-list-item-icon>
                     <v-icon>mdi-delete</v-icon>
                   </v-list-item-icon>
@@ -178,12 +180,13 @@
       style="height:100vh;maxheight:100vh;overflow:auto"
     >
       <Editor
-        v-if="(editid == null) && !load && (OpenMapData().EditProc)"
+        v-if="(editid == null) && !load"
         :save="save"
         :closeEditor="closeEditor"
         :action="mode"
         :findData="OpenMapData()"
         :uid="uid"
+        :readonly="!(OpenMapData().EditProc)"
       />
     </div>
     <div v-bind:hidden="!(mode=='setting')" style="height:100vh;maxheight:100vh;overflow:auto">
@@ -199,7 +202,23 @@
   </div>
 </template>
 <script>
-//:id="id" :editid="editid"
+/*
+Новые конструкции
+17.09.2020  
+Если в t_rpDeclare заполнено поле DispParamName , то по IdDeclare = DispParamName
+создается новый Finder и присваивается полю Setting . По полям первой строки таблицы
+Setting.MainTab заполняются параметры @ в запросе исходного Finder. Для возможности
+изменить параметры Setting.EditProc!='', Setting.SaveFieldList!='' . 
+Для Setting  можно заполнять таблицу t_sysFieldMap
+
+24.09.2020
+(Фрактал, орган)
+Если в записи есть поля keyf, dispfield, iddeclare , то при детализации берутся
+значения из этих полей, а не из соответсвующих полей объекта Finder (iddeclare 
+используется вместо KeyValue)
+
+*/
+
 import { mainObj, openMap, openIDs, prodaction, baseUrl } from "../main";
 import Pagination from "./Pagination";
 import Editor from "./Editor";
@@ -290,17 +309,34 @@ let Finder = {
       let mid = this.OpenMapData();
       if (mid.curRow == null) return;
       let rw = mid.MainTab[mid.curRow];
-      let val = rw[mid.KeyF];
+      let val;
+      let par;
       let jsstr = {};
-      jsstr[mid.KeyF] = val;
+      let title;
+      if ((rw["iddeclare"]) && (rw["keyf"])) {
+        let KeyF = rw["keyf"];
+        let DispField = rw["dispfield"]; 
+        let KeyValue = rw["iddeclare"];
+        
+        val = rw[KeyF];
+        jsstr[KeyF] = val;
+        par = KeyValue;
+        title = rw[DispField];
+      } else {
+        val = rw[mid.KeyF];
+        jsstr[mid.KeyF] = val;
+        par = mid.KeyValue;
+        title = rw[mid.DispField];
+      }
+
       let obj = {
         Control: Finder,
-        Params: mid.KeyValue,
+        Params: par,
         TextParams: jsstr,
-        title: rw[mid.DispField],
+        title: title,
         data: {}
       };
-      let newid = this.id + "_" + val;
+      let newid = this.id + "_" + rw[mid.KeyF];
       if (openMap.get(newid) == null) {
         openMap.set(newid, obj);
         openIDs.push(newid);
@@ -511,7 +547,7 @@ let Finder = {
       data.ColumnTab.map(column => {
         data.WorkRow[column] = row[column] == null ? "" : row[column];
       });
-      data.ReferEdit.Editors.map(column => {
+      data.Fcols.map(column => {
         if (column.DisplayFormat != "") {
           data.WorkRow[column.FieldName] = this.dateformat(
             data.WorkRow[column.FieldName],
@@ -530,7 +566,16 @@ let Finder = {
       data.ColumnTab.map(column => {
         data.WorkRow[column] = row[column] == null ? "" : row[column];
       });
-      this.uid2 = "-10";
+      data.Fcols.map(column => {
+        if (column.DisplayFormat != "") {
+          data.WorkRow[column.FieldName] = this.dateformat(
+            data.WorkRow[column.FieldName],
+            column.DisplayFormat
+          );
+        }
+      });
+      this.nadd = this.nadd + 1;
+      this.uid2 = "uid2" + this.nadd.toString();
       this.mode = "setting";
     }
   },
@@ -588,8 +633,7 @@ let Finder = {
       let v = OpenMapId();
       v.data = data;
       this.Descr = data.Descr;
-      if (mid.title)
-        this.Descr = this.Descr + " (" + mid.title + ")";
+      if (mid.title) this.Descr = this.Descr + " (" + mid.title + ")";
 
       setLoad(false);
     }
@@ -601,7 +645,7 @@ export default Finder;
 
 <style scoped>
 .selected {
-  background-color: #C2185B;
-    color: lightblue;
+  background-color: #c2185b;
+  color: lightblue;
 }
 </style>

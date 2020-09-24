@@ -81,11 +81,10 @@ export default {
       }
     },
     next: function() {
-      if (mainObj.curhistory < mainObj.history.length-1) {
+      if (mainObj.curhistory < mainObj.history.length - 1) {
         mainObj.curhistory = mainObj.curhistory + 1;
         mainObj.drawer = false;
         mainObj.current = mainObj.history[mainObj.curhistory];
-
       }
     },
     exit: function() {
@@ -119,7 +118,6 @@ export default {
       mainObj.current = id;
       mainObj.curhistory = mainObj.curhistory + 1;
       mainObj.history.splice(mainObj.curhistory, mainObj.history.length, id);
-
     },
     getForm: function(item) {
       let p = item.attributes;
@@ -128,6 +126,7 @@ export default {
       let SQLParams = null;
 
       if (p.link1 == "RegulationPrint.Dgs.DogovorList") control = Dogovors;
+      
 
       return {
         Conrol: control,

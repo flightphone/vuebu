@@ -5,7 +5,7 @@
         <v-app-bar-nav-icon v-if="action!='setting'" @click="mainObj.drawer = true"></v-app-bar-nav-icon>
         <v-toolbar-title>{{Descr()}}</v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-btn icon @click="save()">
+        <v-btn icon @click="save()" v-if="!readonly">
           <v-icon>mdi-check</v-icon>
         </v-btn>
         <v-btn icon @click="closeEditor()">
@@ -13,58 +13,72 @@
         </v-btn>
       </v-app-bar>
       <v-main>
-        <v-simple-table v-if="!load">
+        <v-simple-table>
           <template v-slot:default>
             <tbody v-if="(nupdate > 0) && uid !=''">
-              <tr v-for="(column, index) in findData.ReferEdit.Editors" :key="index">
-                <td>
-                  <v-text-field 
-                    v-if="column.joinRow==null"
-                    :label="column.FieldCaption"
-                    :key="column.FieldName + uid"
-                    v-model="findData.WorkRow[column.FieldName]"
-                    @change="(event)=>textChange(event, column.FieldName)"
-                  ></v-text-field>
-                  <template v-else>
+              <template v-if="readonly">
+                <tr v-for="(column, index) in findData.Fcols" :key="index">
+                  <td>
                     <v-text-field
-                      v-if="column.joinRow.classname == 'Bureau.Finder'"
+                      :label="column.FieldCaption"
+                      :key="column.FieldName + uid"
+                      :value="findData.WorkRow[column.FieldName]"
+                      readonly
+                    ></v-text-field>
+                  </td>
+                </tr>
+              </template>
+              <template v-else>
+                <tr v-for="(column, index) in findData.ReferEdit.Editors" :key="index">
+                  <td>
+                    <v-text-field
+                      v-if="column.joinRow==null"
                       :label="column.FieldCaption"
                       :key="column.FieldName + uid"
                       v-model="findData.WorkRow[column.FieldName]"
-                      append-icon="mdi-magnify"
-                      @click:append="open(index)"
                     ></v-text-field>
+                    <template v-else>
+                      <v-text-field
+                        v-if="column.joinRow.classname == 'Bureau.Finder'"
+                        :label="column.FieldCaption"
+                        :key="column.FieldName + uid"
+                        v-model="findData.WorkRow[column.FieldName]"
+                        append-icon="mdi-magnify"
+                        @click:append="open(index)"
+                      ></v-text-field>
 
-                    <v-select
-                      v-if="column.joinRow.classname == 'Bureau.GridCombo'"
-                      :label="column.FieldCaption"
-                      :items="column.joinRow.FindConrol.MainTab"
-                      :item-value="column.joinRow.keyField"
-                      :item-text="column.joinRow.FindConrol.DispField"
-                      :key="column.FieldName + uid"
-                      v-model="findData.WorkRow[column.joinRow.valField]"
-                    ></v-select>
-                  </template>
-                </td>
-              </tr>
+                      <v-select
+                        v-if="column.joinRow.classname == 'Bureau.GridCombo'"
+                        :label="column.FieldCaption"
+                        :items="column.joinRow.FindConrol.MainTab"
+                        :item-value="column.joinRow.keyField"
+                        :item-text="column.joinRow.FindConrol.DispField"
+                        :key="column.FieldName + uid"
+                        v-model="findData.WorkRow[column.joinRow.valField]"
+                      ></v-select>
+                    </template>
+                  </td>
+                </tr>
+              </template>
             </tbody>
           </template>
         </v-simple-table>
       </v-main>
     </div>
-
-    <template v-for="(column, index) in findData.ReferEdit.Editors">
-      <template v-if="column.joinRow != null">
-        <Finder
-          v-if="column.joinRow.classname == 'Bureau.Finder'"
-          :visible="mode=='finder_' + index.toString()"
-          :params="column.joinRow.IdDeclare"
-          :editid="index"
-          :findData="column.joinRow.FindConrol"
-          :key="index"
-          :selectFinder="selectFinder"
-          :clearFinder="clearFinder"
-        />
+    <template v-if="!readonly">
+      <template v-for="(column, index) in findData.ReferEdit.Editors">
+        <template v-if="column.joinRow != null">
+          <Finder
+            v-if="column.joinRow.classname == 'Bureau.Finder'"
+            :visible="mode=='finder_' + index.toString()"
+            :params="column.joinRow.IdDeclare"
+            :editid="index"
+            :findData="column.joinRow.FindConrol"
+            :key="index"
+            :selectFinder="selectFinder"
+            :clearFinder="clearFinder"
+          />
+        </template>
       </template>
     </template>
   </div>
@@ -84,7 +98,8 @@ export default {
     closeEditor: Function,
     action: String,
     findData: Object,
-    uid: String
+    uid: String,
+    readonly: Boolean
   },
   beforeCreate: function() {
     this.$options.components.Finder = require("./Finder.vue").default;
@@ -92,7 +107,10 @@ export default {
   methods: {
     Descr: function() {
       if (this.action == "add") return "Новая запись";
-      if (this.action == "edit") return "Редактирование";
+      if (this.action == "edit") {
+        if (this.readonly) return "Просмотр";
+        else return "Редактирование";
+      }
       if (this.action == "setting") return "Параметры";
     },
     open: function(index) {
@@ -122,8 +140,7 @@ export default {
       this.mode = "edit";
     },
     textChange: function(event, index) {
-        this.findData.WorkRow[index] = event;
-        
+      this.findData.WorkRow[index] = event;
     }
   }
 };
