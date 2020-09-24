@@ -302,8 +302,18 @@ let Finder = {
       this.load = b;
     },
     handleClick: function(index) {
-      this.OpenMapData().curRow = index;
-      this.current = index;
+      if (this.OpenMapData().curRow == index) {
+        //double click
+        this.current = index;
+        if (this.editid == null) {
+          if (this.OpenMapData().EditProc) this.edit();
+          else if (this.OpenMapData().KeyValue) this.openDetail();
+          else this.edit();
+        } else this.selectFinder(this.editid);
+      } else {
+        this.OpenMapData().curRow = index;
+        this.current = index;
+      }
     },
     openDetail: function() {
       let mid = this.OpenMapData();
@@ -313,11 +323,11 @@ let Finder = {
       let par;
       let jsstr = {};
       let title;
-      if ((rw["iddeclare"]) && (rw["keyf"])) {
+      if (rw["iddeclare"] && rw["keyf"]) {
         let KeyF = rw["keyf"];
-        let DispField = rw["dispfield"]; 
+        let DispField = rw["dispfield"];
         let KeyValue = rw["iddeclare"];
-        
+
         val = rw[KeyF];
         jsstr[KeyF] = val;
         par = KeyValue;
