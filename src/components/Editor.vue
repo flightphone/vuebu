@@ -45,6 +45,7 @@
                         v-model="findData.WorkRow[column.FieldName]"
                         append-icon="mdi-magnify"
                         @click:append="open(index)"
+						readonly
                       ></v-text-field>
 
                       <v-select
