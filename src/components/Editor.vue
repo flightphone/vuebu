@@ -56,6 +56,7 @@
                         :item-text="column.joinRow.FindConrol.DispField"
                         :key="column.FieldName + uid"
                         v-model="findData.WorkRow[column.joinRow.valField]"
+                        @change="(event)=>sortChange(event, column)"
                       ></v-select>
                     </template>
                   </td>
