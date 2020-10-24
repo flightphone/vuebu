@@ -5,6 +5,7 @@ import Comp2 from './components/Comp1.vue';
 import vuetify from './plugins/vuetify';
 
 Vue.config.productionTip = false;
+const prodaction = false;
 
 let mainObj = {
   message: "ого",
@@ -28,7 +29,7 @@ let mainObj = {
   curhistory: 0
   
 }; 
-const prodaction = false;
+
 const baseUrl = (prodaction) ? "" : "http://192.168.43.81:5000/";
 
 let openMap = new Map();
