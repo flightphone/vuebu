@@ -4,8 +4,8 @@ import App from './App.vue'
 import Comp2 from './components/Comp1.vue';
 import vuetify from './plugins/vuetify';
 
-Vue.config.productionTip = false;
-const prodaction = false;
+Vue.config.productionTip = true;
+const prodaction = true;
 
 let mainObj = {
   message: "ого",

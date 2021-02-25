@@ -58,6 +58,7 @@ import { mainObj, openIDs, prodaction, baseUrl, openMap } from "./main";
 import Comp1 from "./components/Comp1.vue";
 import Finder from "./components/Finder.vue";
 import Dogovors from "./components/Dogovors.vue";
+import Uxrep from "./components/Uxrep.vue";
 
 export default {
   name: "App",
@@ -126,6 +127,7 @@ export default {
       let SQLParams = null;
 
       if (p.link1 == "RegulationPrint.Dgs.DogovorList") control = Dogovors;
+      if (params == "1550") control = Uxrep;
       
 
       return {
