@@ -1,4 +1,5 @@
 <template>
+
   <div v-bind:hidden="!visible" style="height:100vh;maxheight:100vh;overflow:auto">
     <div v-bind:hidden="mode!='grid'" style="height:100vh;maxheight:100vh;overflow:auto">
       <v-app-bar app color="primary" dark v-if="!stateDrawer" max-width="100vw">
@@ -79,6 +80,16 @@
                   </v-list-item-icon>
                   <v-list-item-content>
                     <v-list-item-title>Экспорт в CSV</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+
+                <v-list-item key="11" @click="loadFile()">
+                  <v-list-item-icon>
+                    <v-icon>mdi-database-plus</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    <v-list-item-title>Файлы</v-list-item-title>
+                    <a target="_blanck" hidden ref="fileLink2"></a>
                   </v-list-item-content>
                 </v-list-item>
 
@@ -380,6 +391,18 @@ let Finder = {
           a.setAttribute("download", "data.csv");
           a.click();
         });
+    },
+
+    loadFile: function(){
+      let mid = this.OpenMapData();
+      if (mid.curRow == null) return;
+      let rw = mid.MainTab[mid.curRow];
+      const IdDeclare = this.params;
+      let agr_key = "F" + IdDeclare + "_" + rw[mid.KeyF];
+      let agr_caption = mid.Descr + ", " + rw[mid.DispField];
+      let res = baseUrl + "Docfiles/dir?id=" + agr_key + "/&caption=" + agr_caption;
+      this.$refs.fileLink2.href = res;
+      this.$refs.fileLink2.click();
     },
 
     confirmDelete: function() {
