@@ -128,6 +128,7 @@ export default {
 
       if (p.link1 == "RegulationPrint.Dgs.DogovorList") control = Dogovors;
       if (params == "1550") control = Uxrep;
+      if (params == "1451") control = Uxrep;
       
 
       return {
