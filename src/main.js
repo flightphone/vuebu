@@ -5,7 +5,7 @@ import Comp2 from './components/Comp1.vue';
 import vuetify from './plugins/vuetify';
 
 Vue.config.productionTip = true;
-const prodaction = true;
+const prodaction = false;
 
 let mainObj = {
   message: "ого",

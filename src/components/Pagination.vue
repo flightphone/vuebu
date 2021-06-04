@@ -1,7 +1,7 @@
 <template>
   <v-app-bar app color="primary" dark max-width="100vw">
     <span hidden>{{$parent.action}}</span>
-    {{page() * rowsPerPage + 1}} - {{Math.min((page() + 1) * rowsPerPage, count())}} из {{count()}}
+    {{page() * nrows() + 1}} - {{Math.min((page() + 1) * nrows(), count())}} из {{count()}}
     <v-spacer></v-spacer>
     <v-btn icon @click="$parent.onChangePage(0)" :disabled="page() === 0">
       <v-icon>mdi-page-first</v-icon>
@@ -9,18 +9,18 @@
     <v-btn icon @click="$parent.onChangePage(page()-1)" :disabled="page() === 0">
       <v-icon>mdi-chevron-left</v-icon>
     </v-btn>
-    {{page() + 1}} из {{Math.max(0, Math.ceil(count() / rowsPerPage) - 1) + 1}}
+    {{page() + 1}} из {{Math.max(0, Math.ceil(count() / nrows()) - 1) + 1}}
     <v-btn
       icon
       @click="$parent.onChangePage(page()+1)"
-      :disabled="page() >= Math.ceil(count() / rowsPerPage) - 1"
+      :disabled="page() >= Math.ceil(count() / nrows()) - 1"
     >
       <v-icon>mdi-chevron-right</v-icon>
     </v-btn>
     <v-btn
       icon
-      @click="$parent.onChangePage(Math.max(0, Math.ceil(count() / rowsPerPage) - 1))"
-      :disabled="page() >= Math.ceil(count() / rowsPerPage) - 1"
+      @click="$parent.onChangePage(Math.max(0, Math.ceil(count() / nrows()) - 1))"
+      :disabled="page() >= Math.ceil(count() / nrows()) - 1"
     >
       <v-icon>mdi-page-last</v-icon>
     </v-btn>
@@ -42,7 +42,7 @@ export default {
   props: {
     //id: String,
     //editid: Number
-    findData:Object
+    findData: Object
   },
   methods: {
     OpenMapData: function() {
@@ -52,7 +52,7 @@ export default {
         return openMap.get(this.id).data.ReferEdit.Editors[this.editid].joinRow
           .FindConrol;
       */
-       return this.findData;    
+      return this.findData;
     },
     count: function() {
       if (this.OpenMapData().TotalTab)
@@ -62,6 +62,10 @@ export default {
     page: function() {
       if (this.OpenMapData().page) return this.OpenMapData().page - 1;
       else return 0;
+    },
+    nrows: function() {
+      if (this.OpenMapData().nrows) return this.OpenMapData().nrows;
+      else return 30;
     }
   }
 };
