@@ -17,8 +17,8 @@
           <template v-slot:default>
             <tbody v-if="(nupdate > 0) && uid !=''">
               <template v-if="readonly">
-                <tr v-for="(column, index) in findData.Fcols" :key="index">
-                  <td>
+                <tr v-for="(column, index) in findData.Fcols" :key="index" style="background-color:white">
+                  <td style="border-bottom: none;">
                     <v-text-field
                       :label="column.FieldCaption"
                       :key="column.FieldName + uid"
@@ -29,8 +29,8 @@
                 </tr>
               </template>
               <template v-else>
-                <tr v-for="(column, index) in findData.ReferEdit.Editors" :key="index">
-                  <td>
+                <tr v-for="(column, index) in findData.ReferEdit.Editors" :key="index" style="background-color:white">
+                  <td style="border-bottom: none;">
                     <v-text-field
                       v-if="column.joinRow==null"
                       :label="column.FieldCaption"

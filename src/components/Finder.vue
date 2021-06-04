@@ -134,11 +134,11 @@
               </tr>
             </thead>
             <tbody v-if="(nupdate > 0)">
-              <tr
+              <tr 
                 v-for="(row, index) in OpenMapData().MainTab"
                 :key="index"
                 @click="handleClick(index)"
-                v-bind:class="{selected: (index==current)}"
+                v-bind:style="{'background-color': (index==current)?selectedColor:'white'}"
               >
                 <td
                   v-for="column in OpenMapData().Fcols"
@@ -162,18 +162,18 @@
         </v-btn>
       </v-app-bar>
       <v-main>
-        <v-simple-table v-if="!load" dense>
+        <v-simple-table v-if="!load" dense light>
           <template v-slot:default>
             <tbody>
-              <tr v-for="(column, index) in OpenMapData().Fcols" :key="column.FieldName">
-                <td>
+              <tr v-for="(column, index) in OpenMapData().Fcols" :key="column.FieldName" style="background-color:white;">
+                <td style="border-bottom: none;">
                   <v-text-field :label="column.FieldCaption" v-model="column.FindString"></v-text-field>
                 </td>
-                <td>
+                <td style="border-bottom: none;">
                   {{column.SortOrder}}
                   <span hidden>{{rangSort}}</span>
                 </td>
-                <td>
+                <td style="border-bottom: none;">
                   <v-select
                     :items="items"
                     v-model="column.Sort"
@@ -213,6 +213,7 @@
   </div>
 </template>
 <script>
+
 /*
 Новые конструкции
 17.09.2020  
@@ -255,7 +256,8 @@ let Finder = {
     items: ["Нет", "По возрастанию", "По убыванию"],
     rangSort: 0,
     uid: "zz",
-    uid2: "yy"
+    uid2: "yy",
+    selectedColor: "LightGreen"
   }),
   props: {
     visible: {
@@ -273,6 +275,11 @@ let Finder = {
     gridHeight: function()
     {
       return document.documentElement.clientHeight - 65;
+    },
+
+    finderRowStyle: function()
+    {
+
     }
   },
   methods: {
@@ -687,7 +694,10 @@ export default Finder;
 
 <style scoped>
 .selected {
-  background-color: #c2185b;
+  background-color: LightGreen;
   color: lightblue;
 }
+
 </style>
+
+
