@@ -2,7 +2,7 @@
 
   <div v-bind:hidden="!visible" style="height:100vh;maxheight:100vh;overflow:auto">
     <div v-bind:hidden="mode!='grid'" style="height:100vh;maxheight:100vh;overflow:auto">
-      <v-app-bar app color="primary" dark v-if="!stateDrawer" max-width="100vw">
+      <v-app-bar app color="primary" dark v-if="!stateDrawer" max-width="100vw" height="65">
         <v-app-bar-nav-icon v-if="(editid == null)" @click="mainObj.drawer = true"></v-app-bar-nav-icon>
         <v-toolbar-title>{{Descr}}</v-toolbar-title>
         <v-spacer></v-spacer>
@@ -123,14 +123,14 @@
       <Pagination :findData="OpenMapData()" v-if="stateDrawer" />
 
       <v-main>
-        <v-simple-table v-if="!load" dense>
+        <v-simple-table v-if="!load" dense fixed-header :height="gridHeight">
           <template v-slot:default>
             <thead>
               <tr>
-                <th
+                <th style="background-color: LightGrey"
                   v-for="column in OpenMapData().Fcols"
                   :key="column.FieldName"
-                >{{column.FieldCaption}}</th>
+                ><br/>{{column.FieldCaption}}</th>
               </tr>
             </thead>
             <tbody v-if="(nupdate > 0)">
@@ -228,6 +228,10 @@ Setting.MainTab заполняются параметры @ в запросе и
 значения из этих полей, а не из соответсвующих полей объекта Finder (iddeclare 
 используется вместо KeyValue)
 
+
+04.06.2021
+Решена проблема фиксации заголовков гридов и полос прокрутки. 
+Заголовоки гридов покрашены в LightGrey
 */
 
 import { mainObj, openMap, openIDs, prodaction, baseUrl } from "../main";
@@ -265,7 +269,12 @@ let Finder = {
     selectFinder: Function,
     clearFinder: Function
   },
-  computed: {},
+  computed: {
+    gridHeight: function()
+    {
+      return document.documentElement.clientHeight - 65;
+    }
+  },
   methods: {
     sortChange: function(event, index) {
       let rang = 0;
