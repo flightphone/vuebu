@@ -29,6 +29,7 @@
         <v-btn icon @click="exit()">
           <v-icon>mdi-exit-to-app</v-icon>
         </v-btn>
+        <a target="_blanck" hidden ref="openFileLink"></a>
       </v-app-bar>
       <v-main>
         <p v-if="loading">Загрузка...</p>
@@ -94,6 +95,16 @@ export default {
     handleselect: function(item) {
       if (!item.children) {
         //alert(item.attributes.link1);
+        let lnk = item.attributes.link1;
+        if (lnk) {
+          if (lnk.substring(0, 1) == "/") {
+              lnk = baseUrl + lnk;
+              this.$refs.openFileLink.href = lnk;
+              this.$refs.openFileLink.click();
+              mainObj.drawer = false;
+              return;
+          }
+        }
         this.open(item);
         mainObj.drawer = false;
       }
@@ -129,7 +140,6 @@ export default {
       if (p.link1 == "RegulationPrint.Dgs.DogovorList") control = Dogovors;
       if (params == "1550") control = Uxrep;
       if (params == "1451") control = Uxrep;
-      
 
       return {
         Conrol: control,
