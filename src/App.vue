@@ -60,6 +60,7 @@ import Comp1 from "./components/Comp1.vue";
 import Finder from "./components/Finder.vue";
 import Dogovors from "./components/Dogovors.vue";
 import Uxrep from "./components/Uxrep.vue";
+import Tarifs from "./components/Tarifs.vue";
 
 export default {
   name: "App",
@@ -140,6 +141,7 @@ export default {
       if (p.link1 == "RegulationPrint.Dgs.DogovorList") control = Dogovors;
       if (params == "1550") control = Uxrep;
       if (params == "1451") control = Uxrep;
+      if (p.link1 == "tariffs") control = Tarifs;
 
       return {
         Conrol: control,
