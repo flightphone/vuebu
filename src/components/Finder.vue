@@ -24,7 +24,7 @@
           <v-list>
             <v-list-item-group>
               <template v-if="(editid==null) && !load">
-                <v-list-item key="6" @click="add();" v-if="(OpenMapData().EditProc)">
+                <v-list-item key="6" @click="add();" v-if="(OpenMapData().DelProc)">
                   <v-list-item-icon>
                     <v-icon>mdi-plus</v-icon>
                   </v-list-item-icon>
