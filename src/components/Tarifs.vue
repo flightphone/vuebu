@@ -6,7 +6,7 @@
         type="file"
         ref="fileElem"
         style="display:none"
-        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        accept=".csv"
         @change="handleFiles();"
       />
       <v-btn icon @click="upfile()">
@@ -19,7 +19,7 @@
   </Finder>
 </template>
 <script>
-import { mainObj, openMap /*, baseUrl */ } from "../main";
+import { mainObj, openMap, baseUrl  } from "../main";
 import Finder from "./Finder";
 export default {
   name: "Tarifs",
@@ -38,7 +38,7 @@ export default {
       let c = openMap.get(this.id).data.curRow;
       if (c < 0 || c > openMap.get(this.id).data.MainTab.length - 1) return;
       let nn = openMap.get(this.id).data.MainTab[c]["nn"].toString();
-      let lnk = "http://localhost:2000/tffile";
+      let lnk = baseUrl + "FileLoad/tffile";
 
       let files = this.$refs.fileElem.files;
       if (!files.length) return;
@@ -57,6 +57,8 @@ export default {
         .then(function(msg) {
           mainObj.alert("Загрузка файла", msg);
         });
+
+        this.$refs.fileElem.value = "";
     },
     upfile: function() {
       let c = openMap.get(this.id).data.curRow;
@@ -72,7 +74,7 @@ export default {
     fileUrl: function(c) {
       if (c < 0 || c > openMap.get(this.id).data.MainTab.length - 1) return;
       let agr_key = openMap.get(this.id).data.MainTab[c]["nn"].toString();
-      let res = "http://localhost:2000/pg/tariffs/" + agr_key;
+      let res = baseUrl + "FileLoad/tariffs?nn=" + agr_key;
       return res;
     }
   }
