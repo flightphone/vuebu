@@ -2,24 +2,21 @@
   <Finder :id="id" :visible="visible" :params="params" ref="dogFind">
     <template>
       <a hidden ref="fileLink"></a>
-      <input
-        type="file"
-        ref="fileElem"
-        style="display:none"
-        accept=".csv"
-        @change="handleFiles();"
-      />
+      <input type="file" ref="fileElem" style="display:none" accept=".csv" @change="handleFiles();" />
       <v-btn icon @click="upfile()">
         <v-icon>mdi-upload</v-icon>
       </v-btn>
       <v-btn icon @click="openfile()">
         <v-icon>mdi-download</v-icon>
       </v-btn>
+      <v-btn icon @click="confirmRun()">
+        <v-icon>mdi-database-plus</v-icon>
+      </v-btn>
     </template>
   </Finder>
 </template>
 <script>
-import { mainObj, openMap, baseUrl  } from "../main";
+import { mainObj, openMap, baseUrl } from "../main";
 import Finder from "./Finder";
 export default {
   name: "Tarifs",
@@ -46,7 +43,7 @@ export default {
       let f = new FormData();
       f.append("nn", nn);
       f.append("tfile", files[0]);
-      
+
       fetch(lnk, {
         method: "POST",
         body: f
@@ -58,7 +55,36 @@ export default {
           mainObj.alert("Загрузка файла", msg);
         });
 
-        this.$refs.fileElem.value = "";
+      this.$refs.fileElem.value = "";
+    },
+
+    confirmRun: function() {
+      let c = openMap.get(this.id).data.curRow;
+      if (c < 0 || c > openMap.get(this.id).data.MainTab.length - 1) return;
+      let nn = openMap.get(this.id).data.MainTab[c]["nn"].toString();
+      mainObj.confirm(
+        "Внимание! Данная операция переносит тарифы в uSmart",
+        "Перенести тарифы по строке '" + nn.toString() + "' в uSmart?",
+        this.runsql
+      );
+    },
+    runsql: function() {
+      let c = openMap.get(this.id).data.curRow;
+      if (c < 0 || c > openMap.get(this.id).data.MainTab.length - 1) return;
+      let nn = openMap.get(this.id).data.MainTab[c]["nn"].toString();
+      let lnk = baseUrl + "FileLoad/tariffs?nn=" + nn + "&mode=run";
+
+      fetch(lnk, {
+        method: "POST"
+      })
+        .then(function(result) {
+          return result.text();
+        })
+        .then(function(msg) {
+          mainObj.alert("Перенос тарифов в uSmart", msg);
+        });
+
+
     },
     upfile: function() {
       let c = openMap.get(this.id).data.curRow;
