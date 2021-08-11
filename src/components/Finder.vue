@@ -71,6 +71,15 @@
                     <v-list-item-title>Страницы</v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
+
+                <v-list-item key="0" @click="updateTab()">
+                  <v-list-item-icon>
+                    <v-icon>mdi-refresh</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    <v-list-item-title>Обновить</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
               </template>
 
               <template v-if="(editid==null) && !load">

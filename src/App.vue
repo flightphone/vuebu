@@ -142,7 +142,6 @@ export default {
       if (params == "1550") control = Uxrep;
       if (params == "1451") control = Uxrep;
       if (p.link1 == "tariffs") control = Tarifs;
-
       return {
         Conrol: control,
         Params: params,
