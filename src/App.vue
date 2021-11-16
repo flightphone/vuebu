@@ -139,6 +139,7 @@ export default {
       let SQLParams = null;
 
       if (p.link1 == "RegulationPrint.Dgs.DogovorList") control = Dogovors;
+      if (p.link1 == "RegulationPrint.ParamReports.ParReports") control = Uxrep;
       if (params == "1550") control = Uxrep;
       if (params == "1451") control = Uxrep;
       if (p.link1 == "tariffs") control = Tarifs;

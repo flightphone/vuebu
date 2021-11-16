@@ -91,7 +91,7 @@
                     <v-list-item-title>Экспорт в CSV</v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
-
+                <!--
                 <v-list-item key="11" @click="loadFile()">
                   <v-list-item-icon>
                     <v-icon>mdi-database-plus</v-icon>
@@ -101,7 +101,7 @@
                     <a target="_blanck" hidden ref="fileLink2"></a>
                   </v-list-item-content>
                 </v-list-item>
-
+                -->
                 <v-list-item key="4" @click="openDetail()" v-if="OpenMapData().KeyValue">
                   <v-list-item-icon>
                     <v-icon>mdi-details</v-icon>

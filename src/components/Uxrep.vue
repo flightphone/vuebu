@@ -6,6 +6,13 @@
           <v-icon>mdi-file-document</v-icon>
         </v-btn>
         </template>
+
+        <template>
+            <a hidden ref="printLink"></a>
+        <v-btn icon @click="print()">
+          <v-icon>mdi-printer</v-icon>
+        </v-btn>
+        </template>
     </Finder> 
 </template>
 <script>
@@ -26,6 +33,11 @@ export default {
   },
   components: {Finder},
   methods: {
+      print: function(){
+          let c = openMap.get(this.id).data.curRow;
+          this.$refs.printLink.href = this.printUrl(c);
+          this.$refs.printLink.click();
+      },
       openfile: function(){
           let c = openMap.get(this.id).data.curRow;
           this.$refs.fileLink.href = this.fileUrl(c);
@@ -36,6 +48,13 @@ export default {
             return;
           let agr_key = openMap.get(this.id).data.MainTab[c]["FC_PK"].toString();
           let res = baseUrl + "Flight?FC_PK=" + agr_key;
+          return res;
+      },
+      printUrl : function(c){
+          if (c < 0 || c > openMap.get(this.id).data.MainTab.length - 1)
+            return;
+          let agr_key = openMap.get(this.id).data.MainTab[c]["FC_PK"].toString();
+          let res = baseUrl + "Print/tgo_pdf/" + agr_key;
           return res;
       }
 
