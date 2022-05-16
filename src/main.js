@@ -4,21 +4,24 @@ import App from './App.vue'
 import Comp2 from './components/Comp1.vue';
 import vuetify from './plugins/vuetify';
 
+
+
+
 Vue.config.productionTip = true;
-const prodaction = true;
+const prodaction = false;
 
 let mainObj = {
   message: "ого",
   drawer: false,
   current: "-1",
   openAlert: false,
-  alert: function(title, text){
+  alert: function (title, text) {
     this.alertConfirm = false;
     this.alertTitle = title;
     this.alertText = text;
     this.openAlert = true;
   },
-  confirm: function(title, text, action){
+  confirm: function (title, text, action) {
     this.alertConfirm = true;
     this.alertTitle = title;
     this.alertText = text;
@@ -27,10 +30,12 @@ let mainObj = {
   },
   history: ["-1"],
   curhistory: 0
-  
-}; 
 
-const baseUrl = (prodaction) ? "" : "http://192.168.43.81:5000/";
+};
+
+const baseUrl = (prodaction) ? "" : "http://127.0.0.1:5000/";
+
+
 
 let openMap = new Map();
 
@@ -78,7 +83,7 @@ Vue.component('uni-comp', {
     let C = openMap.get(this.id).Control;
     let params = openMap.get(this.id).Params;
     let v = (mainObj.current == this.id);
-    return createElement(C,{
+    return createElement(C, {
       props: {
         id: this.id,
         params: params,
