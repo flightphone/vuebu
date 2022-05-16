@@ -161,7 +161,7 @@
     </div>
     <div v-bind:hidden="mode!='filter'" style="height:100vh;maxheight:100vh;overflow:auto">
       <v-app-bar app color="primary" dark max-width="100vw">
-        <v-toolbar-title>Фильтры, сортировка</v-toolbar-title>
+        <v-toolbar-title>Фильтры, сортировка, modal</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-btn icon @click="updateTab()">
           <v-icon>mdi-check</v-icon>
