@@ -1,6 +1,52 @@
 <template>
 
+
+  
   <div v-bind:hidden="!visible" style="height:100vh;maxheight:100vh;overflow:auto">
+
+    <v-dialog v-model="openFilter" persistent>
+
+      <v-card>
+        <v-card-title class="headline">Фильтровка и сортировка</v-card-title>
+        
+
+      <div style="height:60vh;maxheight:60vh;overflow:auto">
+        <v-simple-table v-if="!load" dense light>
+          <template v-slot:default>
+            <tbody>
+              <tr v-for="(column, index) in OpenMapData().Fcols" :key="column.FieldName" style="background-color:white;">
+                <td style="border-bottom: none;">
+                  <v-text-field :label="column.FieldCaption" v-model="column.FindString"></v-text-field>
+                </td>
+                <td style="border-bottom: none;width:100px">
+                  <v-select
+                    :items="items"
+                    v-model="column.Sort"
+                    @change="(event)=>sortChange(event, index)"
+                  ></v-select>
+                </td>
+
+                <td style="border-bottom: none;width:50px">
+                  {{column.SortOrder}}
+                  <span hidden>{{rangSort}}</span>
+                </td>
+
+              </tr>
+            </tbody>
+          </template>
+        </v-simple-table>
+      
+      
+    </div>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="green darken-1" text @click="updateTab()">ОК</v-btn>
+          <v-btn  @click="setFilter(false )">Отмена</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+
     <div v-bind:hidden="mode!='grid'" style="height:100vh;maxheight:100vh;overflow:auto">
       <v-app-bar app color="primary" dark v-if="!stateDrawer" max-width="100vw" height="65">
         <v-app-bar-nav-icon v-if="(editid == null)" @click="mainObj.drawer = true"></v-app-bar-nav-icon>
@@ -54,7 +100,7 @@
                 </v-list-item>
               </template>
               <template v-if="!load">
-                <v-list-item key="1" @click="mode='filter'">
+                <v-list-item key="1" @click="setFilter(true)">
                   <v-list-item-icon>
                     <v-icon>mdi-filter-menu</v-icon>
                   </v-list-item-icon>
@@ -160,6 +206,7 @@
       </v-main>
     </div>
     <div v-bind:hidden="mode!='filter'" style="height:100vh;maxheight:100vh;overflow:auto">
+      <!--
       <v-app-bar app color="primary" dark max-width="100vw">
         <v-toolbar-title>Фильтры, сортировка, modal</v-toolbar-title>
         <v-spacer></v-spacer>
@@ -194,6 +241,7 @@
           </template>
         </v-simple-table>
       </v-main>
+      -->
     </div>
     <div
       v-bind:hidden="!(mode == 'edit' || mode == 'add')"
@@ -262,11 +310,12 @@ let Finder = {
     action: 1,
     nupdate: 1,
     nadd: 1,
-    items: ["Нет", "По возрастанию", "По убыванию"],
+    items: ["Нет", "ASC", "DESC"],
     rangSort: 0,
     uid: "zz",
     uid2: "yy",
-    selectedColor: "LightGreen"
+    selectedColor: "LightGreen",
+    openFilter: false
   }),
   props: {
     visible: {
@@ -337,6 +386,11 @@ let Finder = {
     setLoad: function(b) {
       this.load = b;
     },
+
+    setFilter: function(b) {
+      this.openFilter = b;
+    },
+
     handleClick: function(index) {
       if (this.OpenMapData().curRow == index) {
         //double click
@@ -510,8 +564,10 @@ let Finder = {
         mid.TotalTab = data.TotalTab;
         mid.page = data.page;
         if (this.mode != "grid");
-        this.mode = "grid";
+          this.mode = "grid";
         this.nupdate = this.nupdate + 1;
+
+        this.openFilter = false;
       }
     },
     saveSetting: function() {
