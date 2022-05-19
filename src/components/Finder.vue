@@ -7,14 +7,14 @@
     <v-dialog v-model="openFilter" persistent>
 
       <v-card>
-        <v-card-title class="headline">Фильтровка и сортировка</v-card-title>
+        <v-card-title>Фильтровка и сортировка</v-card-title>
         
 
       <div style="height:60vh;maxheight:60vh;overflow:auto">
         <v-simple-table v-if="!load" dense light>
           <template v-slot:default>
             <tbody>
-              <tr v-for="(column, index) in OpenMapData().Fcols" :key="column.FieldName" style="background-color:white;">
+              <tr v-for="(column, index) in OpenMapData().Fcols" :key="column.FieldName" style="background-color:white;" >
                 <td style="border-bottom: none;">
                   <v-text-field :label="column.FieldCaption" v-model="column.FindString"></v-text-field>
                 </td>
@@ -41,7 +41,7 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="green darken-1" text @click="updateTab()">ОК</v-btn>
-          <v-btn  @click="setFilter(false )">Отмена</v-btn>
+          <v-btn color="green darken-1" text @click="setFilter(false )">Отмена</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -52,6 +52,20 @@
         <v-app-bar-nav-icon v-if="(editid == null)" @click="mainObj.drawer = true"></v-app-bar-nav-icon>
         <v-toolbar-title>{{Descr}}</v-toolbar-title>
         <v-spacer></v-spacer>
+
+        <v-text-field v-if="!load" 
+            label="Поиск"
+            dense
+            filled
+            rounded
+            hide-details
+            prepend-inner-icon="mdi-magnify"
+            single-line
+            v-model="OpenMapData().Fcols[dispIndex].FindString"
+            @input="updateTab()"
+          ></v-text-field>
+
+        
         <template v-if="(editid != null)">
           <v-btn icon @click="selectFinder(editid)">
             <v-icon>mdi-check</v-icon>
@@ -178,7 +192,9 @@
       <Pagination :findData="OpenMapData()" v-if="stateDrawer" />
 
       <v-main>
-        <v-simple-table v-if="!load" dense fixed-header :height="gridHeight">
+        
+		
+		<v-simple-table v-if="!load" dense fixed-header :height="gridHeight">
           <template v-slot:default>
             <thead>
               <tr>
@@ -203,6 +219,8 @@
             </tbody>
           </template>
         </v-simple-table>
+		
+		
       </v-main>
     </div>
     <div v-bind:hidden="mode!='filter'" style="height:100vh;maxheight:100vh;overflow:auto">
@@ -315,7 +333,9 @@ let Finder = {
     uid: "zz",
     uid2: "yy",
     selectedColor: "LightGreen",
-    openFilter: false
+    openFilter: false,
+    //19/05/2022
+    dispIndex: 0
   }),
   props: {
     visible: {
@@ -388,6 +408,8 @@ let Finder = {
     },
 
     setFilter: function(b) {
+      //b = false;
+      //alert(this.dispIndex);
       this.openFilter = b;
     },
 
@@ -705,6 +727,16 @@ let Finder = {
     if (editid != null) {
       OpenMapData().curRow = 0;
       this.Descr = OpenMapData().Descr + " (выбор)";
+      
+      //19/05/2022
+      let mid = OpenMapData();
+      mid.Fcols.map((column, index)=>{
+         if (column.FieldName == mid.DispField) 
+         {
+            this.dispIndex = index
+         }
+      });
+      
       setLoad(false);
       return;
     }
@@ -738,12 +770,23 @@ let Finder = {
     const data = await response.json();
     if (data.Error) {
       mainObj.alert("Ошибка", data.Error);
+      return;
     } else {
       data.curRow = 0;
       data.WorkRow = {};
       data.ColumnTab.map(column => {
         data.WorkRow[column] = "";
       });
+
+      //19/05/2022
+      data.Fcols.map((column, index)=>{
+         if (column.FieldName == data.DispField) 
+         {
+            this.dispIndex = index
+         }
+      });
+
+      
       let v = OpenMapId();
       v.data = data;
       this.Descr = data.Descr;

@@ -2,7 +2,7 @@
   <v-app>
     <v-dialog v-model="mainObj.openAlert" persistent>
       <v-card>
-        <v-card-title class="headline">{{mainObj.alertTitle}}</v-card-title>
+        <v-card-title>{{mainObj.alertTitle}}</v-card-title>
         <v-card-text>{{mainObj.alertText}}</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
