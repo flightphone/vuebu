@@ -1,5 +1,8 @@
 <template>
   <v-app>
+
+    <a target="_blanck" hidden ref="openFileLink"></a>
+
     <v-dialog v-model="mainObj.openAlert" persistent>
       <v-card>
         <v-card-title>{{mainObj.alertTitle}}</v-card-title>
@@ -17,21 +20,7 @@
       </v-card>
     </v-dialog>
 
-    <v-navigation-drawer v-model="mainObj.drawer" absolute temporary width="auto" left>
-      <v-app-bar app>
-        <v-btn icon @click="back()" :disabled="!(mainObj.curhistory > 0)">
-          <v-icon>mdi-chevron-left</v-icon>
-        </v-btn>
-        <v-btn icon @click="next()" :disabled="!(mainObj.curhistory < mainObj.history.length-1)">
-          <v-icon>mdi-chevron-right</v-icon>
-        </v-btn>
-        <v-spacer></v-spacer>
-        <v-btn icon @click="exit()">
-          <v-icon>mdi-exit-to-app</v-icon>
-        </v-btn>
-        <a target="_blanck" hidden ref="openFileLink"></a>
-      </v-app-bar>
-      <v-main>
+    <v-navigation-drawer v-model="mainObj.drawer" app width="auto" left>
         <p v-if="loading">Загрузка...</p>
         <v-treeview
           v-else
@@ -44,7 +33,6 @@
             <div @click="handleselect(item)">{{ item.text }}</div>
           </template>
         </v-treeview>
-      </v-main>
     </v-navigation-drawer>
 
     <template v-for="item in openIDs">
