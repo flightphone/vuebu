@@ -555,6 +555,9 @@ let Finder = {
       }
       mid.MainTab.splice(mid.curRow, 1);
       this.nupdate = this.nupdate + 1;
+      //Сигнал в слоты 22/05/2022
+      if (openMap.get(this.id).updateTab != null)
+        openMap.get(this.id).updateTab()
     },
     onChangePage: function(p) {
       this.action = this.action + 1;
@@ -667,6 +670,9 @@ let Finder = {
       if (this.mode == "add") data.MainTab.push(row);
       this.mode = "grid";
       this.nupdate = this.nupdate + 1;
+      //Сигнал в слоты 22/05/2022
+      if (openMap.get(this.id).updateTab != null)
+        openMap.get(this.id).updateTab()	  
     },
     closeEditor: function() {
       this.mode = "grid";
