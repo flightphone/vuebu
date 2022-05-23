@@ -243,7 +243,9 @@
         :findData="OpenMapData()"
         :uid="uid"
         :readonly="!(OpenMapData().EditProc)"
-      />
+      >
+      <slot name="editor"></slot> 
+      </Editor>
     </div>
     <div v-bind:hidden="!(mode=='setting')" style="height:100vh;maxheight:100vh;overflow:auto">
       <Editor
