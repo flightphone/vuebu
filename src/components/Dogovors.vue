@@ -138,7 +138,8 @@ export default {
   data: () => ({
     current: 0,
     selectedColor: mainObj.selectedColor,  
-    nupdate: 1
+    nupdate: 1,
+    gridHeight: mainObj.gridHeight() 
   }),
   props: {
     visible: {
@@ -150,6 +151,10 @@ export default {
   },
   components: {Finder},
   methods: {
+    resize: function()
+        {
+            this.gridHeight = mainObj.gridHeight()
+        },  
     updateTab: function()
         {   
             this.nupdate = this.nupdate + 1
@@ -181,14 +186,18 @@ export default {
       }
     },
     computed: {
+      /*
         gridHeight: function()
         {
             return mainObj.gridHeight();
         }
+      */  
     },
     mounted: function()
     {
-        openMap.get(this.id).updateTab = this.updateTab;
+        const mid = openMap.get(this.id)
+        mid.updateTab = this.updateTab;
+        mid.resize = this.resize;
     }    
 }
 </script>

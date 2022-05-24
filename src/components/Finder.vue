@@ -309,6 +309,8 @@ let Finder = {
     openFilter: false,
     //19/05/2022
     dispIndex: 0,
+    //24.05.2022
+    gridHeight: mainObj.gridHeight(), 
   }),
   props: {
     visible: {
@@ -323,17 +325,23 @@ let Finder = {
     clearFinder: Function
   },
   computed: {
+    /*
     gridHeight: function()
     {
       return mainObj.gridHeight();
     },
-
+    */
     finderRowStyle: function()
     {
 
     }
   },
   methods: {
+    //24.05.2022
+    resize: function()
+        {
+            this.gridHeight = mainObj.gridHeight()
+        },
     sortChange: function(event, index) {
       let rang = 0;
       let columns = this.OpenMapData().Fcols;
@@ -737,32 +745,44 @@ let Finder = {
     const editid = this.editid;
     const IdDeclare = this.params;
     
-    //Выбор строки для слота 22.05.2022
-    OpenMapId().handleClick = this.handleClick;
+    
     
 
     if (editid != null) {
-      OpenMapData().curRow = 0;
-      this.Descr = OpenMapData().Descr + " (выбор)";
-      
       //19/05/2022
-      let mid = OpenMapData();
-      mid.Fcols.map((column, index)=>{
-         if (column.FieldName == mid.DispField) 
+      let md = OpenMapData();
+      md.curRow = 0;
+      this.Descr = md.Descr + " (выбор)";
+      md.Fcols.map((column, index)=>{
+         if (column.FieldName == md.DispField) 
          {
             this.dispIndex = index
          }
       });
-      
+      //размер окна
+      md.resize = this.resize;
+      //размеры окон 24/05/2022
+      window.addEventListener('resize', function() {
+      if (md.resize)
+          md.resize()
+      }, true);
+
       setLoad(false);
       return;
     }
+
+    let mid = OpenMapId();
+    //Выбор строки для слота 22.05.2022
+    mid.handleClick = this.handleClick;
+    //изменение размеров окна
+    mid.resize = this.resize;
+
     const url = baseUrl + "React/FinderStart";
     let bd = new FormData();
     bd.append("id", IdDeclare);
 
     
-    let mid = OpenMapId();
+    
     if (mid.SQLParams) {
       bd.append("SQLParams", JSON.stringify(mid.SQLParams));
     }
