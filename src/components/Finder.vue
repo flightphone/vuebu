@@ -1,11 +1,76 @@
 <template>
 
+
+  
   <div v-bind:hidden="!visible" style="height:100vh;maxheight:100vh;overflow:auto">
+
+    <v-dialog v-model="openFilter" persistent>
+      <v-card>
+      <v-card-title>Фильтровка и сортировка</v-card-title>
+      <div style="height:60vh;maxheight:60vh;overflow:auto">
+        <v-simple-table v-if="!load" dense light>
+          <template v-slot:default>
+            <tbody>
+              <tr v-for="(column, index) in OpenMapData().Fcols" :key="column.FieldName" style="background-color:white;" >
+                <td style="border-bottom: none;">
+                  <v-text-field :label="column.FieldCaption" v-model="column.FindString"
+                      :append-icon="getIcon(column)"
+                      @click:append="sortChangeIndex(column, index)"
+                  ></v-text-field>
+                </td>
+                <!--
+                <td style="border-bottom: none;width:100px">
+                  <v-select
+                    :items="items"
+                    v-model="column.Sort"
+                    @change="(event)=>sortChange(event, index)"
+                  ></v-select>
+                </td>
+                -->
+
+                <td style="border-bottom: none;width:50px">
+                  {{column.SortOrder}}
+                  <span hidden>{{rangSort}}</span>
+                  <span hidden>{{nactord}}</span>
+                  
+                </td>
+
+              </tr>
+            </tbody>
+          </template>
+        </v-simple-table>
+      
+      
+    </div>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="green darken-1" text @click="updateTab()">ОК</v-btn>
+          <v-btn color="green darken-1" text @click="setFilter(false )">Отмена</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+
     <div v-bind:hidden="mode!='grid'" style="height:100vh;maxheight:100vh;overflow:auto">
       <v-app-bar app color="primary" dark v-if="!stateDrawer" max-width="100vw" height="65">
         <v-app-bar-nav-icon v-if="(editid == null)" @click="mainObj.drawer = true"></v-app-bar-nav-icon>
         <v-toolbar-title>{{Descr}}</v-toolbar-title>
         <v-spacer></v-spacer>
+        <v-spacer></v-spacer>
+        <v-spacer></v-spacer>
+        <v-text-field v-if="!load" 
+            label="Поиск"
+            dense
+            filled
+            rounded
+            hide-details
+            prepend-inner-icon="mdi-magnify"
+            single-line
+            v-model="OpenMapData().Fcols[dispIndex].FindString"
+            @input="updateTab()"
+          ></v-text-field>
+
+        
         <template v-if="(editid != null)">
           <v-btn icon @click="selectFinder(editid)">
             <v-icon>mdi-check</v-icon>
@@ -54,7 +119,7 @@
                 </v-list-item>
               </template>
               <template v-if="!load">
-                <v-list-item key="1" @click="mode='filter'">
+                <v-list-item key="1" @click="setFilter(true)">
                   <v-list-item-icon>
                     <v-icon>mdi-filter-menu</v-icon>
                   </v-list-item-icon>
@@ -132,7 +197,10 @@
       <Pagination :findData="OpenMapData()" v-if="stateDrawer" />
 
       <v-main>
-        <v-simple-table v-if="!load" dense fixed-header :height="gridHeight">
+        
+		<template v-if="!load">    
+		<slot name="table">
+		<v-simple-table v-if="!load" dense fixed-header :height="gridHeight">
           <template v-slot:default>
             <thead>
               <tr>
@@ -157,42 +225,10 @@
             </tbody>
           </template>
         </v-simple-table>
-      </v-main>
-    </div>
-    <div v-bind:hidden="mode!='filter'" style="height:100vh;maxheight:100vh;overflow:auto">
-      <v-app-bar app color="primary" dark max-width="100vw">
-        <v-toolbar-title>Фильтры, сортировка</v-toolbar-title>
-        <v-spacer></v-spacer>
-        <v-btn icon @click="updateTab()">
-          <v-icon>mdi-check</v-icon>
-        </v-btn>
-        <v-btn icon @click="mode='grid'">
-          <v-icon>mdi-window-close</v-icon>
-        </v-btn>
-      </v-app-bar>
-      <v-main>
-        <v-simple-table v-if="!load" dense light>
-          <template v-slot:default>
-            <tbody>
-              <tr v-for="(column, index) in OpenMapData().Fcols" :key="column.FieldName" style="background-color:white;">
-                <td style="border-bottom: none;">
-                  <v-text-field :label="column.FieldCaption" v-model="column.FindString"></v-text-field>
-                </td>
-                <td style="border-bottom: none;">
-                  {{column.SortOrder}}
-                  <span hidden>{{rangSort}}</span>
-                </td>
-                <td style="border-bottom: none;">
-                  <v-select
-                    :items="items"
-                    v-model="column.Sort"
-                    @change="(event)=>sortChange(event, index)"
-                  ></v-select>
-                </td>
-              </tr>
-            </tbody>
-          </template>
-        </v-simple-table>
+        </slot>
+        </template>
+		
+		
       </v-main>
     </div>
     <div
@@ -207,7 +243,9 @@
         :findData="OpenMapData()"
         :uid="uid"
         :readonly="!(OpenMapData().EditProc)"
-      />
+      >
+      <slot name="editor"></slot> 
+      </Editor>
     </div>
     <div v-bind:hidden="!(mode=='setting')" style="height:100vh;maxheight:100vh;overflow:auto">
       <Editor
@@ -261,12 +299,18 @@ let Finder = {
     stateDrawer: false,
     action: 1,
     nupdate: 1,
+    nactord: 1,  //20.05.2022
     nadd: 1,
-    items: ["Нет", "По возрастанию", "По убыванию"],
+    items: ["Нет", "ASC", "DESC"],
     rangSort: 0,
     uid: "zz",
     uid2: "yy",
-    selectedColor: "LightGreen"
+    selectedColor: mainObj.selectedColor,
+    openFilter: false,
+    //19/05/2022
+    dispIndex: 0,
+    //24.05.2022
+    gridHeight: mainObj.gridHeight(), 
   }),
   props: {
     visible: {
@@ -281,62 +325,108 @@ let Finder = {
     clearFinder: Function
   },
   computed: {
+    /*
     gridHeight: function()
     {
-      return document.documentElement.clientHeight - 65;
+      return mainObj.gridHeight();
     },
-
+    */
     finderRowStyle: function()
     {
 
     }
   },
   methods: {
+    //24.05.2022
+    resize: function()
+        {
+            this.gridHeight = mainObj.gridHeight()
+        },
     sortChange: function(event, index) {
       let rang = 0;
       let columns = this.OpenMapData().Fcols;
       columns.map((column, i) => {
+        if (column.Sort == "Нет")  
+          column.SortOrder = null;
+
         if (i != index && column.SortOrder)
           if (column.SortOrder > rang) rang = column.SortOrder;
+        
       });
       columns[index].SortOrder = rang + 1;
       this.rangSort = rang + 1;
+      this.nactord = this.nactord + 1;
       //columns[index].Sort = event.target.value;
     },
+    //20.05.2022
+    sortChangeIndex: function(column, index)
+    {
+      if (column.Sort == "ASC")
+          column.Sort = "DESC"
+      else
+      if (column.Sort == "DESC")    
+        column.Sort = "Нет"
+      else
+        column.Sort = "ASC"
+
+      this.sortChange (null, index)  
+    },
+    //20.05.2022
+    getIcon: function(column)
+    {
+      if (column.Sort == "ASC")
+          return "mdi-arrow-down"
+      
+      if (column.Sort == "DESC") 
+          return "mdi-arrow-up"
+      
+         return "mdi-sort";
+    },
+
+
     dateformat: function(d, f) {
-      if (!d) return d;
-
-      if (d.length != 24) {
-        let res = f.match(/0\.(0+)/);
-
-        let n = 0;
-        if (res)
-          if (res.length > 1) {
-            n = res[1].length;
-          }
-
-        if (n > 0) return Number(d.toString()).toFixed(n);
-        else return d;
-      }
-      f = f.replace("yyyy", d.substr(0, 4));
-      f = f.replace("yy", d.substr(2, 2));
-      f = f.replace("MM", d.substr(5, 2));
-      f = f.replace("dd", d.substr(8, 2));
-      f = f.replace("HH", d.substr(11, 2));
-      f = f.replace("mm", d.substr(14, 2));
-      return f;
+      return mainObj.dateformat(d, f);
     },
 
     OpenMapData: function() {
-      if (this.id != null) return openMap.get(this.id).data;
-      else return this.findData;
+      if (this.id != null) 
+      {
+          if (openMap.get(this.id) == null) 
+          {
+              
+              openMap.set(this.id, {
+                  Control: null,
+                  Params: this.params,
+                  SQLParams: null,
+                  data: {}
+              })
+          }
+          return openMap.get(this.id).data;
+      }
+      return this.findData;
     },
     OpenMapId: function() {
-      return openMap.get(this.id);
+      if (openMap.get(this.id) == null) 
+          {
+              openMap.set(this.id, {
+                  Control: null,
+                  Params: this.params,
+                  SQLParams: null,
+                  data: {}
+              })
+          }
+        return openMap.get(this.id);
     },
     setLoad: function(b) {
       this.load = b;
     },
+
+    setFilter: function(b) {
+      //b = false;
+      //alert(this.dispIndex);
+      this.openFilter = b;
+    },
+
     handleClick: function(index) {
       if (this.OpenMapData().curRow == index) {
         //double click
@@ -475,6 +565,9 @@ let Finder = {
       }
       mid.MainTab.splice(mid.curRow, 1);
       this.nupdate = this.nupdate + 1;
+      //Сигнал в слоты 22/05/2022
+      if (openMap.get(this.id).updateTab != null)
+        openMap.get(this.id).updateTab()
     },
     onChangePage: function(p) {
       this.action = this.action + 1;
@@ -510,8 +603,12 @@ let Finder = {
         mid.TotalTab = data.TotalTab;
         mid.page = data.page;
         if (this.mode != "grid");
-        this.mode = "grid";
+          this.mode = "grid";
         this.nupdate = this.nupdate + 1;
+        this.openFilter = false;
+        //Сигнал в слоты 22/05/2022
+        if (openMap.get(this.id).updateTab != null)
+          openMap.get(this.id).updateTab()
       }
     },
     saveSetting: function() {
@@ -583,6 +680,9 @@ let Finder = {
       if (this.mode == "add") data.MainTab.push(row);
       this.mode = "grid";
       this.nupdate = this.nupdate + 1;
+      //Сигнал в слоты 22/05/2022
+      if (openMap.get(this.id).updateTab != null)
+        openMap.get(this.id).updateTab()	  
     },
     closeEditor: function() {
       this.mode = "grid";
@@ -644,28 +744,45 @@ let Finder = {
 
     const editid = this.editid;
     const IdDeclare = this.params;
-    //const filterid = this.filterid;
+    
+    
+    
 
     if (editid != null) {
-      OpenMapData().curRow = 0;
-      this.Descr = OpenMapData().Descr + " (выбор)";
+      //19/05/2022
+      let md = OpenMapData();
+      md.curRow = 0;
+      this.Descr = md.Descr + " (выбор)";
+      md.Fcols.map((column, index)=>{
+         if (column.FieldName == md.DispField) 
+         {
+            this.dispIndex = index
+         }
+      });
+      //размер окна
+      md.resize = this.resize;
+      //размеры окон 24/05/2022
+      window.addEventListener('resize', function() {
+      if (md.resize)
+          md.resize()
+      }, true);
+
       setLoad(false);
       return;
     }
+
+    let mid = OpenMapId();
+    //Выбор строки для слота 22.05.2022
+    mid.handleClick = this.handleClick;
+    //изменение размеров окна
+    mid.resize = this.resize;
+
     const url = baseUrl + "React/FinderStart";
     let bd = new FormData();
     bd.append("id", IdDeclare);
 
-    let mid = OpenMapId();
-    /*
-    if (filterid != null && openMap.get(filterid) != null) {
-      let fdat = openMap.get(filterid).data;
-      fdat.ReferEdit.SaveFieldList.map(f => {
-        mid.SQLParams["@" + f] = fdat.MainTab[0][f];
-      });
-    }
-    */
-
+    
+    
     if (mid.SQLParams) {
       bd.append("SQLParams", JSON.stringify(mid.SQLParams));
     }
@@ -682,19 +799,31 @@ let Finder = {
     const data = await response.json();
     if (data.Error) {
       mainObj.alert("Ошибка", data.Error);
-    } else {
+      return;
+    } 
+
       data.curRow = 0;
       data.WorkRow = {};
       data.ColumnTab.map(column => {
         data.WorkRow[column] = "";
       });
-      let v = OpenMapId();
-      v.data = data;
+
+      //19/05/2022
+      data.Fcols.map((column, index)=>{
+         if (column.FieldName == data.DispField) 
+         {
+            this.dispIndex = index
+         }
+      });
+
+      
+      
+      mid.data = data;
       this.Descr = data.Descr;
       if (mid.title) this.Descr = this.Descr + " (" + mid.title + ")";
 
       setLoad(false);
-    }
+    
   }
 };
 

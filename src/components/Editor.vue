@@ -13,6 +13,7 @@
         </v-btn>
       </v-app-bar>
       <v-main>
+        <slot>
         <v-simple-table>
           <template v-slot:default>
             <tbody v-if="(nupdate > 0) && uid !=''">
@@ -65,6 +66,7 @@
             </tbody>
           </template>
         </v-simple-table>
+        </slot>
       </v-main>
     </div>
     <template v-if="!readonly">
@@ -108,12 +110,12 @@ export default {
   },
   methods: {
     Descr: function() {
-      if (this.action == "add") return "Новая запись";
+      if (this.action == "add") return "Новая запись (" + this.findData.Descr + ")";
       if (this.action == "edit") {
-        if (this.readonly) return "Просмотр";
-        else return "Редактирование";
+        if (this.readonly) return "Просмотр (" + this.findData.Descr + ")";
+        else return "Редактирование (" + this.findData.Descr + ")";
       }
-      if (this.action == "setting") return "Параметры";
+      if (this.action == "setting") return "Параметры (" + this.findData.Descr + ")";
     },
     open: function(index) {
       this.mode = "finder_" + index.toString();
