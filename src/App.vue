@@ -43,14 +43,12 @@
   
 
 <script>
-//import { encode } from "base-64";
 import { mainObj, openIDs, prodaction, baseUrl, openMap } from "./main";
 import Comp1 from "./components/Comp1.vue";
 import Finder from "./components/Finder.vue";
 import Dogovors from "./components/Dogovors.vue";
 import Uxrep from "./components/Uxrep.vue";
 import Tarifs from "./components/Tarifs.vue";
-
 export default {
   name: "App",
   data: function() {
@@ -103,7 +101,6 @@ export default {
       mainObj.openAlert = false;
       if (mainObj.alertConfirm) mainObj.confirmAction();
     },
-    
     open: function(item) {
       let id = item.id;
       if (openMap.get(id) == null) {
@@ -127,7 +124,6 @@ export default {
       let control = p.params ? Finder : Comp1;
       let params = p.params;
       let SQLParams = null;
-
       if (p.link1 == "RegulationPrint.Dgs.DogovorList") control = Dogovors;
       if (p.link1 == "RegulationPrint.ParamReports.ParReports") control = Uxrep;
       if (params == "1550") control = Uxrep;
@@ -141,42 +137,15 @@ export default {
     }
   },
   mounted: async function() {
-
-    /*
-    if (!prodaction)  
-    {   
-      let username = 'Admin';
-      let password = 'aA12345678';
-      let formdata = new FormData();
-      let headers = new Headers();
-
-        headers.append('Authorization', 'Basic ' + encode(username + ":" + password));
-        let ur  = baseUrl + "Home/hidelogin";
-        let respo = await fetch(ur, {
-          method: "POST",
-          mode: "cors",
-          cache: "no-cache",
-          credentials: "include",
-          headers: headers,
-          body: formdata
-          });
-        
-        let d = await respo.text();
-        //console.log(d);   
-    }
-    */
-
     let elHtml = document.getElementsByTagName("html")[0];
     elHtml.style.overflowY = "hidden";
-
     const url = baseUrl + "ustore/gettree";
     const response = await fetch(url, {
       method: "POST", // *GET, POST, PUT, DELETE, etc.
       mode: prodaction ? "no-cors" : "cors", // no-cors, *cors, same-origin
       cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-      credentials: "include" // include, *same-origin, omit
+      credentials: prodaction ? "include" : "omit" // include, *same-origin, omit
     });
-
     let data = await response.json();
     this.treejson = data;
     this.loading = false;
