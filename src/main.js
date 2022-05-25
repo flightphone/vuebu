@@ -1,5 +1,5 @@
-import Vue from 'vue'
-import App from './App.vue'
+import Vue from 'vue';
+import App from './App.vue';
 
 import Comp2 from './components/Comp1.vue';
 import vuetify from './plugins/vuetify';
@@ -8,22 +8,26 @@ import vuetify from './plugins/vuetify';
 
 
 Vue.config.productionTip = true;
-const prodaction = false;
+const prodaction = true;
 
 let openMap = new Map();
 openMap.set("-1",
   {
     Control: Comp2,
     Params: "",
-    SQLParams: {},
+    SQLParams: null,
     data: {}
   });
 
+let openIDs = [];
+  openIDs.push("-1");  
 
+
+//запускаем нужную форму через стартовый якорь, например #839 (договоры), #81 тарифы  
 let mainObj = {
   message: "ого",
   drawer: false,
-  current: "-1",
+  current: "-2",
   openAlert: false,
   alert: function (title, text) {
     this.alertConfirm = false;
@@ -82,8 +86,7 @@ const baseUrl = (prodaction) ? "" : "http://localhost:5000/";
 
 
 
-let openIDs = [];
-openIDs.push("-1");
+
 
 //размеры окон 24/05/2022
 window.addEventListener('resize', function() {
@@ -91,6 +94,14 @@ window.addEventListener('resize', function() {
       mainObj.resize()
 }, true);
 
+//история переходов
+window.addEventListener('popstate', function() {
+  let hi = window.location.hash.replace('#', '');
+  if (hi!=mainObj.current && openIDs.includes(hi))
+  {
+      mainObj.current = hi;
+  }
+}, false);
 
 Vue.component('uni-comp', {
   data: function () {

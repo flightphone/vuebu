@@ -116,8 +116,10 @@ export default {
       }
       //Setcurrent(id);
       mainObj.current = id;
-      mainObj.curhistory = mainObj.curhistory + 1;
-      mainObj.history.splice(mainObj.curhistory, mainObj.history.length, id);
+      //mainObj.curhistory = mainObj.curhistory + 1;
+      //mainObj.history.splice(mainObj.curhistory, mainObj.history.length, id);
+      //25.05.2022 история по якорям
+      window.location.hash = id;
     },
     getForm: function(item) {
       let p = item.attributes;
@@ -149,6 +151,34 @@ export default {
     let data = await response.json();
     this.treejson = data;
     this.loading = false;
+    
+    //стартовый якорь 25.05.2022
+    let hi = window.location.hash.replace('#', '');
+    if (hi == "839")
+     {
+      openMap.set(hi,
+      {
+        Control: Dogovors,
+        Params: "1445",
+        SQLParams: null,
+        data: {}
+      });
+      openIDs.push(hi);
+      mainObj.current = hi;
+     }
+
+     if (hi == "81")
+     {
+      openMap.set(hi,
+      {
+        Control: Tarifs,
+        Params: "133",
+        SQLParams: null,
+        data: {}
+      });
+      openIDs.push(hi);
+      mainObj.current = hi;
+     }
   }
 };
 </script>

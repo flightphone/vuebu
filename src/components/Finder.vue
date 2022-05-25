@@ -478,8 +478,10 @@ let Finder = {
         openIDs.push(newid);
       }
       mainObj.current = newid;
-      mainObj.curhistory = mainObj.curhistory + 1;
-      mainObj.history.splice(mainObj.curhistory, mainObj.history.length, newid);
+      //mainObj.curhistory = mainObj.curhistory + 1;
+      //mainObj.history.splice(mainObj.curhistory, mainObj.history.length, newid);
+      //25.05.2022 история по якорям
+      window.location.hash = newid;
     },
     csv: function() {
       const url = baseUrl + "React/csv";
