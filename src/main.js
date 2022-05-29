@@ -8,7 +8,7 @@ import vuetify from './plugins/vuetify';
 
 
 Vue.config.productionTip = true;
-const prodaction = true;
+const prodaction = false;
 
 let openMap = new Map();
 openMap.set("-1",
@@ -27,7 +27,7 @@ let openIDs = [];
 let mainObj = {
   message: "ого",
   drawer: false,
-  current: "-2",
+  current: "-1",
   openAlert: false,
   alert: function (title, text) {
     this.alertConfirm = false;
@@ -136,3 +136,13 @@ new Vue({
 }).$mount('#app');
 
 export { openMap, mainObj, openIDs, prodaction, baseUrl }
+
+/*
+Обновления май 2022
+1. Поле поиска по DisplayField
+2. Модальное окно фильтров, переработан дизайн
+3. slot для таблицы и формы редактирования, по одному тесту сделано
+4. Отработка на событие resize  с правильным пересчетом размеров гридов
+5. Добавляются якоря при переходам по ссылкам, поддерживает история переходов в браузере. Запуск по якорю 839 или
+   81
+*/
