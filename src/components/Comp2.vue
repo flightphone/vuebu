@@ -1,7 +1,7 @@
 <template>
   <div v-bind:hidden="!visible" style="height:100vh;maxheight:100vh;overflow:auto">
     
-    <v-app-bar app color="primary" dark>
+    <v-app-bar app>
       <v-app-bar-nav-icon @click="mainObj.drawer = true"></v-app-bar-nav-icon>
       <v-toolbar-title>Не реализовано</v-toolbar-title>
       <v-spacer></v-spacer>

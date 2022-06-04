@@ -1,6 +1,6 @@
 <template>
     <div   v-bind:hidden="!visible">
-      <v-app-bar app color="primary" dark>
+      <v-app-bar app >
         <v-app-bar-nav-icon @click="mainObj.drawer = true"></v-app-bar-nav-icon>
         <v-toolbar-title></v-toolbar-title>
         <v-spacer></v-spacer>
