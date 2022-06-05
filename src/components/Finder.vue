@@ -653,7 +653,7 @@ let Finder = {
       data.ColumnTab.map(column => {
         row[column] = data.WorkRow[column];
       });
-      if (this.mode == "add") data.MainTab.push(row);
+      if (this.mode == "add") data.MainTab.unshift(row); //05.06.2022
       this.mode = "grid";
       this.nupdate = this.nupdate + 1;
       //Сигнал в слоты 22/05/2022

@@ -27,7 +27,7 @@ let openIDs = [];
 let mainObj = {
   message: "ого",
   drawer: false,
-  current: "-1",
+  current: "-1", //=0 для запуска по якорю
   openAlert: false,
   alert: function (title, text) {
     this.alertConfirm = false;
