@@ -1,62 +1,40 @@
 <template>
-
-
-  
   <div v-bind:hidden="!visible" style="height:100vh;maxheight:100vh;overflow:auto">
-
     <v-dialog v-model="openFilter" persistent>
       <v-card>
-      <v-card-title>Фильтровка и сортировка</v-card-title>
-      <div style="height:60vh;maxheight:60vh;overflow:auto">
-        <v-simple-table v-if="!load" dense light>
-          <template v-slot:default>
-            <tbody>
-              <tr v-for="(column, index) in OpenMapData().Fcols" :key="column.FieldName" style="background-color:white;" >
-                <td style="border-bottom: none;">
-                  <v-badge style="width:100%"
-                    :content="column.SortOrder"
-                    color="info"
-                    overlap
-                    top
-                  >
-                  <v-text-field :label="column.FieldCaption" v-model="column.FindString"
-                      :prepend-inner-icon="getIcon(column)"
-                      @click:prepend-inner = "sortChangeIndex(column, index)"
-                  ></v-text-field>
-                  <!--
-                    :append-icon="getIcon(column)"
-                      @click:append="sortChangeIndex(column, index)"
-                    -->
-                  </v-badge>
-                  <span hidden>{{rangSort}}</span>
-                  <span hidden>{{nactord}}</span>
-                </td>
-                <!--
-                <td style="border-bottom: none;width:100px">
-                  <v-select
-                    :items="items"
-                    v-model="column.Sort"
-                    @change="(event)=>sortChange(event, index)"
-                  ></v-select>
-                </td>
-                -->
-                <!--
-                <td style="border-bottom: none;width:0px">
-                  {{column.SortOrder}}
-                  <span hidden>{{rangSort}}</span>
-                  <span hidden>{{nactord}}</span>
-                  
-                </td>
-                -->
-              
-
-              </tr>
-            </tbody>
-          </template>
-        </v-simple-table>
-      
-      
-    </div>
+        <v-card-title>Фильтровка и сортировка</v-card-title>
+        <div style="height:60vh;maxheight:60vh;overflow:auto">
+          <v-simple-table v-if="!load" dense light>
+            <template v-slot:default>
+              <tbody>
+                <tr
+                  v-for="(column, index) in OpenMapData().Fcols"
+                  :key="column.FieldName"
+                  style="background-color:white;"
+                >
+                  <td style="border-bottom: none;">
+                    <v-badge
+                      style="width:100%"
+                      :content="column.SortOrder"
+                      color="info"
+                      overlap
+                      top
+                    >
+                      <v-text-field
+                        :label="column.FieldCaption"
+                        v-model="column.FindString"
+                        :prepend-inner-icon="getIcon(column)"
+                        @click:prepend-inner="sortChangeIndex(column, index)"
+                      ></v-text-field>
+                    </v-badge>
+                    <span hidden>{{rangSort}}</span>
+                    <span hidden>{{nactord}}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </template>
+          </v-simple-table>
+        </div>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="green darken-1" text @click="updateTab()">ОК</v-btn>
@@ -65,27 +43,26 @@
       </v-card>
     </v-dialog>
 
-
     <div v-bind:hidden="mode!='grid'" style="height:100vh;maxheight:100vh;overflow:auto">
       <v-app-bar app v-if="!stateDrawer" max-width="100vw" height="65">
-        <v-app-bar-nav-icon v-if="(editid == null)" @click="mainObj.drawer = true"></v-app-bar-nav-icon>
+        <v-app-bar-nav-icon v-if="(editid == null)" @click="mainObj.drawer = !mainObj.drawer"></v-app-bar-nav-icon>
         <v-toolbar-title>{{Descr}}</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-spacer></v-spacer>
         <v-spacer></v-spacer>
-        <v-text-field v-if="!load" 
-            label="Поиск"
-            dense
-            filled
-            rounded
-            hide-details
-            prepend-inner-icon="mdi-magnify"
-            single-line
-            v-model="OpenMapData().Fcols[dispIndex].FindString"
-            @input="updateTab()"
-          ></v-text-field>
+        <v-text-field
+          v-if="!load"
+          label="Поиск"
+          dense
+          filled
+          rounded
+          hide-details
+          prepend-inner-icon="mdi-magnify"
+          single-line
+          v-model="OpenMapData().Fcols[dispIndex].FindString"
+          @input="updateTab()"
+        ></v-text-field>
 
-        
         <template v-if="(editid != null)">
           <v-btn icon @click="selectFinder(editid)">
             <v-icon>mdi-check</v-icon>
@@ -212,38 +189,39 @@
       <Pagination :findData="OpenMapData()" v-if="stateDrawer" />
 
       <v-main>
-        
-		<template v-if="!load">    
-		<slot name="table">
-		<v-simple-table v-if="!load" dense fixed-header :height="gridHeight">
-          <template v-slot:default>
-            <thead>
-              <tr>
-                <th style="background-color: LightGrey"
-                  v-for="column in OpenMapData().Fcols"
-                  :key="column.FieldName"
-                ><br/>{{column.FieldCaption}}</th>
-              </tr>
-            </thead>
-            <tbody v-if="(nupdate > 0)">
-              <tr 
-                v-for="(row, index) in OpenMapData().MainTab"
-                :key="index"
-                @click="handleClick(index)"
-                v-bind:style="{'background-color': (index==current)?selectedColor:'white'}"
-              >
-                <td
-                  v-for="column in OpenMapData().Fcols"
-                  :key="column.FieldName"
-                >{{(column.DisplayFormat == "") ? row[column.FieldName] : dateformat(row[column.FieldName], column.DisplayFormat)}}</td>
-              </tr>
-            </tbody>
-          </template>
-        </v-simple-table>
-        </slot>
+        <template v-if="!load">
+          <slot name="table">
+            <v-simple-table v-if="!load" dense fixed-header :height="gridHeight">
+              <template v-slot:default>
+                <thead>
+                  <tr>
+                    <th
+                      style="background-color: LightGrey"
+                      v-for="column in OpenMapData().Fcols"
+                      :key="column.FieldName"
+                    >
+                      <br />
+                      {{column.FieldCaption}}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody v-if="(nupdate > 0)">
+                  <tr
+                    v-for="(row, index) in OpenMapData().MainTab"
+                    :key="index"
+                    @click="handleClick(index)"
+                    v-bind:style="{'background-color': (index==current)?selectedColor:'white'}"
+                  >
+                    <td
+                      v-for="column in OpenMapData().Fcols"
+                      :key="column.FieldName"
+                    >{{(column.DisplayFormat == "") ? row[column.FieldName] : dateformat(row[column.FieldName], column.DisplayFormat)}}</td>
+                  </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
+          </slot>
         </template>
-		
-		
       </v-main>
     </div>
     <div
@@ -259,7 +237,7 @@
         :uid="uid"
         :readonly="!(OpenMapData().EditProc)"
       >
-      <slot name="editor"></slot> 
+        <slot name="editor"></slot>
       </Editor>
     </div>
     <div v-bind:hidden="!(mode=='setting')" style="height:100vh;maxheight:100vh;overflow:auto">
@@ -275,7 +253,6 @@
   </div>
 </template>
 <script>
-
 /*
 Новые конструкции
 17.09.2020  
@@ -299,7 +276,7 @@ Setting.MainTab заполняются параметры @ в запросе и
 
 import { mainObj, openMap, openIDs, prodaction, baseUrl } from "../main";
 import Pagination from "./Pagination";
-import Editor from "./Editor";
+import Editor from "./Editor_ac";
 
 let Finder = {
   name: "Finder",
@@ -314,7 +291,7 @@ let Finder = {
     stateDrawer: false,
     action: 1,
     nupdate: 1,
-    nactord: 1,  //20.05.2022
+    nactord: 1, //20.05.2022
     nadd: 1,
     items: ["Нет", "ASC", "DESC"],
     rangSort: 0,
@@ -325,7 +302,7 @@ let Finder = {
     //19/05/2022
     dispIndex: 0,
     //24.05.2022
-    gridHeight: mainObj.gridHeight(), 
+    gridHeight: mainObj.gridHeight()
   }),
   props: {
     visible: {
@@ -346,27 +323,21 @@ let Finder = {
       return mainObj.gridHeight();
     },
     */
-    finderRowStyle: function()
-    {
-
-    }
+    finderRowStyle: function() {}
   },
   methods: {
     //24.05.2022
-    resize: function()
-        {
-            this.gridHeight = mainObj.gridHeight()
-        },
+    resize: function() {
+      this.gridHeight = mainObj.gridHeight();
+    },
     sortChange: function(event, index) {
       let rang = 0;
       let columns = this.OpenMapData().Fcols;
       columns.map((column, i) => {
-        if (column.Sort == "Нет")  
-          column.SortOrder = null;
+        if (column.Sort == "Нет") column.SortOrder = null;
 
         if (i != index && column.SortOrder)
           if (column.SortOrder > rang) rang = column.SortOrder;
-        
       });
       columns[index].SortOrder = rang + 1;
       this.rangSort = rang + 1;
@@ -374,63 +345,50 @@ let Finder = {
       //columns[index].Sort = event.target.value;
     },
     //20.05.2022
-    sortChangeIndex: function(column, index)
-    {
-      if (column.Sort == "ASC")
-          column.Sort = "DESC"
-      else
-      if (column.Sort == "DESC")    
-        column.Sort = "Нет"
-      else
-        column.Sort = "ASC"
+    sortChangeIndex: function(column, index) {
+      if (column.Sort == "ASC") column.Sort = "DESC";
+      else if (column.Sort == "DESC") column.Sort = "Нет";
+      else column.Sort = "ASC";
 
-      this.sortChange (null, index)  
+      this.sortChange(null, index);
     },
     //20.05.2022
-    getIcon: function(column)
-    {
-      if (column.Sort == "ASC")
-          return "mdi-arrow-down"
-      
-      if (column.Sort == "DESC") 
-          return "mdi-arrow-up"
-      
-         return "mdi-sort";
-    },
+    getIcon: function(column) {
+      if (column.Sort == "ASC") return "mdi-arrow-down";
 
+      if (column.Sort == "DESC") return "mdi-arrow-up";
+
+      return "mdi-sort";
+    },
 
     dateformat: function(d, f) {
       return mainObj.dateformat(d, f);
     },
 
     OpenMapData: function() {
-      if (this.id != null) 
-      {
-          if (openMap.get(this.id) == null) 
-          {
-              
-              openMap.set(this.id, {
-                  Control: null,
-                  Params: this.params,
-                  SQLParams: null,
-                  data: {}
-              })
-          }
-          return openMap.get(this.id).data;
+      if (this.id != null) {
+        if (openMap.get(this.id) == null) {
+          openMap.set(this.id, {
+            Control: null,
+            Params: this.params,
+            SQLParams: null,
+            data: {}
+          });
+        }
+        return openMap.get(this.id).data;
       }
       return this.findData;
     },
     OpenMapId: function() {
-      if (openMap.get(this.id) == null) 
-          {
-              openMap.set(this.id, {
-                  Control: null,
-                  Params: this.params,
-                  SQLParams: null,
-                  data: {}
-              })
-          }
-        return openMap.get(this.id);
+      if (openMap.get(this.id) == null) {
+        openMap.set(this.id, {
+          Control: null,
+          Params: this.params,
+          SQLParams: null,
+          data: {}
+        });
+      }
+      return openMap.get(this.id);
     },
     setLoad: function(b) {
       this.load = b;
@@ -525,14 +483,15 @@ let Finder = {
         });
     },
 
-    loadFile: function(){
+    loadFile: function() {
       let mid = this.OpenMapData();
       if (mid.curRow == null) return;
       let rw = mid.MainTab[mid.curRow];
       const IdDeclare = this.params;
       let agr_key = "F" + IdDeclare + "_" + rw[mid.KeyF];
       let agr_caption = mid.Descr + ", " + rw[mid.DispField];
-      let res = baseUrl + "Docfiles/dir?id=" + agr_key + "/&caption=" + agr_caption;
+      let res =
+        baseUrl + "Docfiles/dir?id=" + agr_key + "/&caption=" + agr_caption;
       this.$refs.fileLink2.href = res;
       this.$refs.fileLink2.click();
     },
@@ -584,7 +543,7 @@ let Finder = {
       this.nupdate = this.nupdate + 1;
       //Сигнал в слоты 22/05/2022
       if (openMap.get(this.id).updateTab != null)
-        openMap.get(this.id).updateTab()
+        openMap.get(this.id).updateTab();
     },
     onChangePage: function(p) {
       this.action = this.action + 1;
@@ -620,12 +579,12 @@ let Finder = {
         mid.TotalTab = data.TotalTab;
         mid.page = data.page;
         if (this.mode != "grid");
-          this.mode = "grid";
+        this.mode = "grid";
         this.nupdate = this.nupdate + 1;
         this.openFilter = false;
         //Сигнал в слоты 22/05/2022
         if (openMap.get(this.id).updateTab != null)
-          openMap.get(this.id).updateTab()
+          openMap.get(this.id).updateTab();
       }
     },
     saveSetting: function() {
@@ -699,7 +658,7 @@ let Finder = {
       this.nupdate = this.nupdate + 1;
       //Сигнал в слоты 22/05/2022
       if (openMap.get(this.id).updateTab != null)
-        openMap.get(this.id).updateTab()	  
+        openMap.get(this.id).updateTab();
     },
     closeEditor: function() {
       this.mode = "grid";
@@ -713,6 +672,35 @@ let Finder = {
       this.nadd = this.nadd + 1;
       this.uid = "uid" + this.nadd.toString();
       this.mode = "add";
+      this.initautocomp(data);
+    },
+    initautocomp: function(data) {
+      //Инициализация для autocomplete 05/06/2022
+      for (let i in data.ReferEdit.Editors) {
+        let column = data.ReferEdit.Editors[i];
+        if (
+          column.joinRow != null &&
+          column.joinRow.classname == "Bureau.Finder"
+        ) {
+          let row = {};
+          for (let s in column.joinRow.fields) {
+            row[s] = data.WorkRow[column.joinRow.fields[s]];
+            if (s == column.joinRow.FindConrol.KeyF) {
+              column.joinRow.FindConrol.KeyValue = row[s];
+            }
+          }
+          //поле для поиска
+          for (let i in column.joinRow.FindConrol.Fcols)
+            if (
+              column.joinRow.FindConrol.Fcols[i].FieldName ==
+              column.joinRow.FindConrol.DispField
+            )
+              column.joinRow.FindConrol.dispIndex = i;
+
+          if (column.joinRow.FindConrol.KeyValue != "")
+            column.joinRow.FindConrol.MainTab.push(row);
+        }
+      }
     },
     edit: function() {
       let data = this.OpenMapData();
@@ -730,6 +718,8 @@ let Finder = {
           );
         }
       });
+      if (data.EditProc!='')
+        this.initautocomp(data);
       this.nadd = this.nadd + 1;
       this.uid = "uid" + this.nadd.toString();
       this.mode = "edit";
@@ -749,6 +739,7 @@ let Finder = {
           );
         }
       });
+      this.initautocomp(data);
       this.nadd = this.nadd + 1;
       this.uid2 = "uid2" + this.nadd.toString();
       this.mode = "setting";
@@ -761,28 +752,27 @@ let Finder = {
 
     const editid = this.editid;
     const IdDeclare = this.params;
-    
-    
-    
 
     if (editid != null) {
       //19/05/2022
       let md = OpenMapData();
       md.curRow = 0;
       this.Descr = md.Descr + " (выбор)";
-      md.Fcols.map((column, index)=>{
-         if (column.FieldName == md.DispField) 
-         {
-            this.dispIndex = index
-         }
+      md.Fcols.map((column, index) => {
+        if (column.FieldName == md.DispField) {
+          this.dispIndex = index;
+        }
       });
       //размер окна
       md.resize = this.resize;
       //размеры окон 24/05/2022
-      window.addEventListener('resize', function() {
-      if (md.resize)
-          md.resize()
-      }, true);
+      window.addEventListener(
+        "resize",
+        function() {
+          if (md.resize) md.resize();
+        },
+        true
+      );
 
       setLoad(false);
       return;
@@ -798,8 +788,6 @@ let Finder = {
     let bd = new FormData();
     bd.append("id", IdDeclare);
 
-    
-    
     if (mid.SQLParams) {
       bd.append("SQLParams", JSON.stringify(mid.SQLParams));
     }
@@ -817,30 +805,26 @@ let Finder = {
     if (data.Error) {
       mainObj.alert("Ошибка", data.Error);
       return;
-    } 
+    }
 
-      data.curRow = 0;
-      data.WorkRow = {};
-      data.ColumnTab.map(column => {
-        data.WorkRow[column] = "";
-      });
+    data.curRow = 0;
+    data.WorkRow = {};
+    data.ColumnTab.map(column => {
+      data.WorkRow[column] = "";
+    });
 
-      //19/05/2022
-      data.Fcols.map((column, index)=>{
-         if (column.FieldName == data.DispField) 
-         {
-            this.dispIndex = index
-         }
-      });
+    //19/05/2022
+    data.Fcols.map((column, index) => {
+      if (column.FieldName == data.DispField) {
+        this.dispIndex = index;
+      }
+    });
 
-      
-      
-      mid.data = data;
-      this.Descr = data.Descr;
-      if (mid.title) this.Descr = this.Descr + " (" + mid.title + ")";
+    mid.data = data;
+    this.Descr = data.Descr;
+    if (mid.title) this.Descr = this.Descr + " (" + mid.title + ")";
 
-      setLoad(false);
-    
+    setLoad(false);
   }
 };
 
@@ -852,7 +836,6 @@ export default Finder;
   background-color: LightGreen;
   color: lightblue;
 }
-
 </style>
 
 

@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar app color="primary" dark max-width="100vw">
+  <v-app-bar app max-width="100vw">
     <span hidden>{{$parent.action}}</span>
     {{page() * nrows() + 1}} - {{Math.min((page() + 1) * nrows(), count())}} из {{count()}}
     <v-spacer></v-spacer>

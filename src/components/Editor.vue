@@ -2,7 +2,7 @@
   <div style="height:100vh;maxheight:100vh;overflow:auto">
     <div v-bind:hidden="mode!='edit'" style="height:100vh;maxheight:100vh;overflow:auto">
       <v-app-bar app  max-width="100vw">
-        <v-app-bar-nav-icon v-if="action!='setting'" @click="mainObj.drawer = true"></v-app-bar-nav-icon>
+        <v-app-bar-nav-icon v-if="action!='setting'" @click="mainObj.drawer = !mainObj.drawer"></v-app-bar-nav-icon>
         <v-toolbar-title>{{Descr()}}</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-btn icon @click="save()" v-if="!readonly">
