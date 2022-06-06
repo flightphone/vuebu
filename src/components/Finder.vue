@@ -244,7 +244,7 @@
       <Editor
         v-if="OpenMapData().IdDeclareSet && !load"
         :save="saveSetting"
-        :closeEditor="closeEditor"
+        :closeEditor="closeSetting"
         :action="mode"
         :findData="OpenMapData().Setting"
         :uid="uid2"
@@ -295,7 +295,7 @@ let Finder = {
     nadd: 1,
     items: ["Нет", "ASC", "DESC"],
     rangSort: 0,
-    uid: "zz",
+    uid: "ll",
     uid2: "yy",
     selectedColor: mainObj.selectedColor,
     openFilter: false,
@@ -317,12 +317,6 @@ let Finder = {
     clearFinder: Function
   },
   computed: {
-    /*
-    gridHeight: function()
-    {
-      return mainObj.gridHeight();
-    },
-    */
     finderRowStyle: function() {}
   },
   methods: {
@@ -587,6 +581,15 @@ let Finder = {
           openMap.get(this.id).updateTab();
       }
     },
+    closeSetting: function()
+    {
+      let data = this.OpenMapData().Setting;
+      let row = data.MainTab[0];
+      data.ColumnTab.map(column => {
+        row[column] = data.WorkRow[column];
+      });
+      this.mode = "grid";
+    },
     saveSetting: function() {
       let data = this.OpenMapData().Setting;
       let row = data.MainTab[0];
@@ -708,7 +711,7 @@ let Finder = {
       let c = data.curRow;
       let row = data.MainTab[c];
       data.ColumnTab.map(column => {
-        data.WorkRow[column] = row[column] == null ? "" : row[column];
+        data.WorkRow[column] = (row[column] == null) ? "" : row[column];
       });
       data.Fcols.map(column => {
         if (column.DisplayFormat != "") {
@@ -726,11 +729,14 @@ let Finder = {
     },
     editSetting: function() {
       let data = this.OpenMapData().Setting;
-      data.WorkRow = {};
+      /*
+      if (data.WorkRow == null) data.WorkRow = {};
       let row = data.MainTab[0];
       data.ColumnTab.map(column => {
         data.WorkRow[column] = row[column] == null ? "" : row[column];
       });
+      */
+      data.WorkRow =  data.MainTab[0];
       data.Fcols.map(column => {
         if (column.DisplayFormat != "") {
           data.WorkRow[column.FieldName] = this.dateformat(

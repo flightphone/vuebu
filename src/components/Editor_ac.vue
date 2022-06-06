@@ -163,6 +163,18 @@ export default {
         mid.MainTab = data.MainTab;
         mid.TotalTab = data.TotalTab;
         mid.page = data.page;
+        //добавляем в список текущее значение
+        if (column.joinRow.FindConrol.KeyValue != "")
+        {
+          let row = {}
+          for (let s in column.joinRow.fields)
+          { 
+            row[s] = this.findData.WorkRow[column.joinRow.fields[s]];
+          }  
+          if (!row[column.joinRow.FindConrol.DispField])
+            row[column.joinRow.FindConrol.DispField] = row[column.FieldName]
+          column.joinRow.FindConrol.MainTab.push(row);
+        }
         this.nupdate = this.nupdate + 1;
       }
       
