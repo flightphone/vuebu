@@ -52,8 +52,8 @@
 
 
     <div v-bind:hidden="mode!='grid'" style="height:100vh;maxheight:100vh;overflow:auto">
-      <v-app-bar app color="primary" dark v-if="!stateDrawer" max-width="100vw" height="65">
-        <v-app-bar-nav-icon v-if="(editid == null)" @click="mainObj.drawer = true"></v-app-bar-nav-icon>
+      <v-app-bar app v-if="!stateDrawer" max-width="100vw" height="65">
+        <v-app-bar-nav-icon v-if="(editid == null)" @click="mainObj.drawer = !mainObj.drawer"></v-app-bar-nav-icon>
         <v-toolbar-title>{{Descr}}</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-spacer></v-spacer>

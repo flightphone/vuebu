@@ -20,7 +20,8 @@
       </v-card>
     </v-dialog>
 
-    <v-navigation-drawer v-model="mainObj.drawer" app width="auto" left>
+    <!--<v-navigation-drawer v-model="mainObj.drawer" app width="auto" left>-->
+	<v-navigation-drawer color="primary" dark v-model="mainObj.drawer" app width="280" left>
         <p v-if="loading">Загрузка...</p>
         <v-treeview
           v-else
@@ -49,6 +50,7 @@ import Finder from "./components/Finder.vue";
 import Dogovors from "./components/Dogovors.vue";
 import Uxrep from "./components/Uxrep.vue";
 import Tarifs from "./components/Tarifs.vue";
+import Declare from "./components/Declare";
 export default {
   name: "App",
   data: function() {
@@ -131,6 +133,7 @@ export default {
       if (params == "1550") control = Uxrep;
       if (params == "1451") control = Uxrep;
       if (p.link1 == "tariffs") control = Tarifs;
+      if (p.link1 == "Declare") control = Declare;
       return {
         Conrol: control,
         Params: params,
